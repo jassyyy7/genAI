@@ -1,4 +1,4 @@
-# Kollaborative Webseite
+# genAI - Kollaborative Webseite
 
 Eine einfache Webseite, die für kollaborative Entwicklung konzipiert ist.
 
@@ -34,4 +34,4 @@ Eine einfache Webseite, die für kollaborative Entwicklung konzipiert ist.
 2. Erstelle einen Feature-Branch (`git checkout -b feature/AmazingFeature`)
 3. Committe deine Änderungen (`git commit -m 'Add some AmazingFeature'`)
 4. Pushe zum Branch (`git push origin feature/AmazingFeature`)
-5. Öffne einen Pull Request 
+5. Öffne einen Pull Request
