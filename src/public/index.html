@@ -1,24 +1,50 @@
 <!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kollaborative Webseite</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-    <header>
-        <h1>Willkommen auf unserer Webseite</h1>
-    </header>
-    <main>
-        <section>
-            <h2>Über uns</h2>
-            <p>Dies ist eine kollaborative Webseite im Aufbau.</p>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2024 Kollaborative Webseite</p>
-    </footer>
-    <script src="js/main.js"></script>
-</body>
-</html> 
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Global Garden</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Verlinkung zur externen CSS-Datei -->
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- p5.js Library für kreative Generative Gestaltung -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.2.0/p5.min.js"></script>
+
+    <!-- Datenquelle mit Länderwerten (z. B. CO₂, Wasser etc.) -->
+    <script src="countries.js"></script>
+
+    <!-- Haupt-JavaScript für Flower-Logik -->
+    <script src="flower.js"></script>
+  </head>
+  <body>
+
+    <!-- ⬅️ Titelbereich oben links -->
+    <div class="title-box">
+      <h1>Global Garden</h1>
+      <p>
+        A digital world map where each country is represented by a unique flower.
+        The shape, color, and growth of each bloom are based on environmental factors
+        like CO₂ emissions, biodiversity, or renewable energy usage.
+      </p>
+    </div>
+
+    <!-- ⬅️ Legende unten links -->
+    <div class="legend">
+      <h3>Environmental Indicators:</h3>
+      <ul>
+        <li><span style="background-color: #ff0000;"></span> High CO₂ emissions</li>
+        <li><span style="background-color: #00c864;"></span> Share of renewable energy</li>
+        <li><span style="background-color: #0090ff;"></span> Water consumption</li>
+        <li><span style="background-color: #ffee00;"></span> Air quality</li>
+        <li><span style="background-color: #b000ff;"></span> Biodiversity</li>
+        <li><span style="background-color: #ffa500;"></span> Waste per capita</li>
+        <li><span style="background-color: #ffffff;"></span> Environmental transparency</li>
+      </ul>
+    </div>
+
+    <!-- ➕ Info-Button oben rechts -->
+    <a href="info.html" class="info-button">Info</a>
+
+  </body>
+</html>

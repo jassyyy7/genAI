@@ -1,0 +1,112 @@
+/* Setzt grundlegende Styles für den Body */
+body {
+  margin: 0;                        /* Kein Außenabstand */
+  padding: 0;                       /* Kein Innenabstand */
+  background: #000000;              /* Schwarzer Hintergrund */
+  overflow: hidden;                 /* Keine Scrollbars */
+  font-family: sans-serif;          /* Klare, moderne Schrift */
+}
+
+/* Sorgt dafür, dass das Canvas den gesamten Bildschirm einnimmt */
+canvas {
+  display: block;                   /* Kein Rand oder Inline-Spacing */
+}
+
+/* Legende unten links – zeigt die Farbzuordnung zu Umweltindikatoren */
+.legend {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  color: white;
+  font-size: 14px;
+  background: #0d0d0d;              /* Dunkler Hintergrund */
+  padding: 12px;
+  border-radius: 6px;
+  max-width: 240px;
+  border: 1px solid #222;           /* Dezente Umrandung */
+}
+
+/* Überschrift der Legende */
+.legend h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: bold;
+  border-bottom: 1px solid #444;    /* Unterstrichene Trennung */
+  padding-bottom: 4px;
+  color: #f1f1f1;
+}
+
+/* Entfernt Aufzählungszeichen in der Liste */
+.legend ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Style für jeden Listeneintrag in der Legende */
+.legend li {
+  display: flex;
+  align-items: center;             /* Farbe + Text nebeneinander zentriert */
+  margin-bottom: 6px;
+  color: #ddd;
+}
+
+/* Farbkreis in der Legende */
+.legend li span {
+  width: 12px;
+  height: 12px;
+  display: inline-block;
+  margin-right: 8px;
+  border-radius: 50%;              /* Kreisform */
+  filter: saturate(1.6);           /* Kräftigere Farben */
+}
+
+/* Titelbox oben links mit Projekttitel und Beschreibung */
+.title-box {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  color: white;
+  max-width: 320px;
+  font-family: sans-serif;
+  background: #0d0d0d;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #222;
+}
+
+/* Hauptüberschrift (z. B. „Global Garden“) */
+.title-box h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: bold;
+  color: white;
+}
+
+/* Beschreibungstext unter dem Titel */
+.title-box p {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #aaa;
+}
+
+/* ➕ Info-Button oben rechts */
+.info-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #1a1a1a;
+  color: white;
+  padding: 8px 16px;
+  border: 1px solid #444;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.info-button:hover {
+  background: #333;
+  color: #fff;
+}
