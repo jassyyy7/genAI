@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Homescreen – Global Garden</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #000;
+      overflow: hidden;
+    }
+    #map-container {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      z-index: 1;
+    }
+    #svgMap {
+      width: 100vw;
+      height: 100vh;
+      max-width: 100vw;
+      max-height: 100vh;
+      display: block;
+    }
+    /* Tooltip bleibt oben */
+    #country-tooltip {
+      z-index: 10;
+    }
+    /* Titelbox und Legende bleiben sichtbar */
+    .title-box, .legend, .info-button {
+      z-index: 20;
+    }
+    .center-box {
+      text-align: center;
+      background: rgba(30,30,30,0.95);
+      padding: 48px 36px;
+      border-radius: 16px;
+      box-shadow: 0 4px 32px #0008;
+    }
+    .flower-btn {
+      margin-top: 32px;
+      padding: 16px 40px;
+      font-size: 1.3rem;
+      background: #0090ff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .flower-btn:hover {
+      background: #0070c0;
+    }
+  </style>
+</head>
+<body>
+  <div class="center-box">
+    <!-- ⬅️ Titelbereich oben links -->
+    <div class="title-box">
+      <h1>Global Garden</h1>
+      <p>
+        A digital world map where each country is represented by a unique flower.<br>
+        The shape, color, and growth of each bloom are based on environmental factors
+        like CO₂ emissions, biodiversity, or renewable energy usage.
+      </p>
+    </div>
+
+    <!-- ⬅️ Legende unten links -->
+    <div class="legend">
+      <h3>Environmental Indicators:</h3>
+      <ul>
+        <li><span style="background-color: #ff0000;"></span> High CO₂ emissions</li>
+        <li><span style="background-color: #00c864;"></span> Share of renewable energy</li>
+        <li><span style="background-color: #0090ff;"></span> Water consumption</li>
+        <li><span style="background-color: #ffee00;"></span> Air quality</li>
+        <li><span style="background-color: #b000ff;"></span> Biodiversity</li>
+        <li><span style="background-color: #ffa500;"></span> Waste per capita</li>
+        <li><span style="background-color: #ffffff;"></span> Environmental transparency</li>
+      </ul>
+    </div>
+
+    <!-- ➕ Info-Button oben rechts -->
+    <a href="info.html" class="info-button">Info</a>
+
+    <div id="map-container" style="position:relative; margin-top:40px;">
+      <object id="svgMap" type="image/svg+xml" data="world.svg" width="100%" height="600"></object>
+      <div id="country-tooltip" style="display:none; position:absolute; background:#222; color:#fff; padding:6px 12px; border-radius:6px; pointer-events:none; font-size:15px; z-index:10;"></div>
+    </div>
+    <script>
+      const mapContainer = document.getElementById('map-container');
+      const tooltip = document.getElementById('country-tooltip');
+      const svgObject = document.getElementById('svgMap');
+      svgObject.addEventListener('load', function() {
+        const svgDoc = svgObject.contentDocument;
+        const paths = svgDoc.querySelectorAll('path[name]');
+        paths.forEach(path => {
+          path.addEventListener('mouseenter', function(e) {
+            tooltip.textContent = path.getAttribute('name');
+            tooltip.style.display = 'block';
+          });
+          path.addEventListener('mousemove', function(e) {
+            tooltip.style.left = (e.clientX - mapContainer.getBoundingClientRect().left + 10) + 'px';
+            tooltip.style.top = (e.clientY - mapContainer.getBoundingClientRect().top + 10) + 'px';
+          });
+          path.addEventListener('mouseleave', function() {
+            tooltip.style.display = 'none';
+          });
+        });
+      });
+    </script>
+  </div>
+</body>
+</html> 
