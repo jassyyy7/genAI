@@ -9,12 +9,14 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
 
-// Basis-Route
+// Basis-Route VOR dem static middleware definieren
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'homescreen.html'));
 });
+
+// Static middleware nach der Basis-Route
+app.use(express.static(path.join(__dirname, 'public')));
 
 // API-Route als Beispiel
 app.get('/api/status', (req, res) => {
