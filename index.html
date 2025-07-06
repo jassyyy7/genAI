@@ -1,12 +1,87 @@
 <!DOCTYPE html>
-<html lang="de">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>World Garden - Interaktive Länder-Visualisierung</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About – Global Garden</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      color: #f0f0f0;
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 700px;
+      padding: 40px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 24px;
+    }
+
+    p {
+      line-height: 1.6;
+      font-size: 15px;
+      margin-bottom: 16px;
+      color: #ccc;
+    }
+
+    a.back-button {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 10px 20px;
+      background: #111;
+      border: 1px solid #444;
+      color: #fff;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: background 0.3s ease;
+    }
+
+    a.back-button:hover {
+      background: #333;
+    }
+
+    a.external-link {
+      color: #4da6ff;
+      text-decoration: none;
+    }
+
+    a.external-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>The Global Garden</h1>
+
+    <p>
+      The Global Garden is a data-driven visual art and information project that makes the state of our planet visible in an intuitive way. Every country in the world is represented by a unique digital flower — its shape, color and growth pattern are based on real environmental data.
+    </p>
+
+    <p>
+      The data used comes from the UN Sustainable Development Goals (SDG) database and focuses on key sustainability indicators such as CO₂ emissions per capita, renewable energy share, water consumption, biodiversity, air quality, waste generation and environmental transparency.
+    </p>
+
+    <p>
+      The aim is to translate complex sustainability data into a visual, poetic form that sparks awareness and encourages reflection. The data is publicly accessible and can be explored in full via the UN Statistics Division:
+      <br />
+      <a class="external-link" href="https://unstats.un.org/sdgs/indicators/database/" target="_blank">
+        → unstats.un.org/sdgs/indicators/database
+      </a>
+    </p>
+
+    <a href="src/public/homescreen.html" class="back-button">Start →</a>
+  </div>
+</body>
 </html> 
