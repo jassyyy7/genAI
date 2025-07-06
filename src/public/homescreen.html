@@ -181,11 +181,11 @@
         // Dynamische Grenzen basierend auf Zoom-Level
         // Schon ab Zoom 1.4 Bewegung erlauben, mehr bei höherem Zoom
         const maxMoveX = Math.max(0, (scale - 1.2) * 120); // Horizontale Bewegung
-        const maxMoveY = Math.max(0, (scale - 1.2) * 250); // Viel mehr vertikale Bewegung
+        const maxMoveY = Math.max(0, (scale - 1.2) * 180); // Ausgewogene vertikale Bewegung
         
         // Grenzen anwenden - erlaubt Bewegung beim Zoomen
         translateX = Math.max(-maxMoveX + 100, Math.min(maxMoveX + 100, translateX)); // +100 für Rechtsverschiebung
-        translateY = Math.max(-maxMoveY - 150, Math.min(maxMoveY + 150, translateY)); // Sehr viel mehr nach oben und unten erlaubt
+        translateY = Math.max(-maxMoveY - 80, Math.min(maxMoveY + 80, translateY)); // Ausgewogene Grenzen nach oben und unten
         
         svgObject.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
       }
