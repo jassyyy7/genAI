@@ -13,6 +13,7 @@
       background: #000;
       overflow: hidden;
     }
+
     #map-container {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -23,350 +24,296 @@
       align-items: center;
       margin: 0;
       z-index: 1;
-      /* Sanfter Verlauf an den Rändern */
       mask: radial-gradient(ellipse 90% 85% at center, black 70%, transparent 100%);
       -webkit-mask: radial-gradient(ellipse 90% 85% at center, black 70%, transparent 100%);
     }
+
     #svgMap {
       width: 100vw;
       height: 100vh;
-      max-width: 100vw;
-      max-height: 100vh;
       display: block;
     }
-    /* Tooltip bleibt oben */
+
     #country-tooltip {
       z-index: 10;
     }
-    /* Titelbox und Legende bleiben sichtbar */
-    .title-box, .legend, .info-button {
+
+    .title-box, .info-button {
       z-index: 20;
     }
-    .center-box {
-      text-align: center;
-      background: rgba(0,0,0,0.95);
-      padding: 48px 36px;
-      border-radius: 16px;
-      box-shadow: 0 4px 32px #0008;
-    }
-    .flower-btn {
-      margin-top: 32px;
-      padding: 16px 40px;
-      font-size: 1.3rem;
-      background: #0090ff;
+
+    .title-box {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0,0,0,0.85);
       color: #fff;
-      border: none;
+      padding: 16px;
       border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.2s;
-      text-decoration: none;
-      display: inline-block;
+      max-width: 300px;
+      font-family: sans-serif;
     }
-    .flower-btn:hover {
-      background: #0070c0;
+
+    .title-box h1 {
+      margin: 0 0 8px 0;
+      font-size: 20px;
+    }
+
+    .title-box p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.4;
+      color: #ccc;
+    }
+
+    .info-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #111;
+      color: #fff;
+      padding: 8px 16px;
+      border: 1px solid #444;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .info-button:hover {
+      background: #333;
+    }
+
+    .zoom-controls {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      z-index: 1000;
+    }
+
+    .zoom-controls button {
+      width: 30px;
+      height: 30px;
+      background: #000;
+      color: #fff;
+      border: 1px solid #333;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .zoom-controls button#zoom-reset {
+      font-size: 10px;
     }
   </style>
 </head>
 <body>
-    <!-- ⬅️ Titelbereich oben links -->
-    <div class="title-box">
-      <h1>Global Garden</h1>
-      <p>
-        A digital world map where each country is represented by a unique flower.<br>
-        The shape, color, and growth of each bloom are based on environmental factors
-        like CO₂ emissions, biodiversity, or renewable energy usage.
-      </p>
-    </div>
+  <div class="title-box">
+    <h1>Global Garden</h1>
+    <p>
+      A digital world map where each country is represented by a unique flower.<br>
+      The shape, color, and growth of each bloom are based on environmental factors
+      like CO₂ emissions, biodiversity, or renewable energy usage.
+    </p>
+  </div>
 
-    <!-- ⬅️ Legende unten links -->
-    <div class="legend">
-      <h3>Environmental Indicators:</h3>
-      <ul>
-        <li><span style="background-color: #ff0000;"></span> High CO₂ emissions</li>
-        <li><span style="background-color: #00c864;"></span> Share of renewable energy</li>
-        <li><span style="background-color: #0090ff;"></span> Water consumption</li>
-        <li><span style="background-color: #ffee00;"></span> Air quality</li>
-        <li><span style="background-color: #b000ff;"></span> Biodiversity</li>
-        <li><span style="background-color: #ffa500;"></span> Waste per capita</li>
-        <li><span style="background-color: #ffffff;"></span> Environmental transparency</li>
-      </ul>
-    </div>
+  <a href="info.html" class="info-button">Info</a>
 
-    <!-- ➕ Info-Button oben rechts -->
-    <a href="info.html" class="info-button">Info</a>
-
-  <div class="center-box">
-
-    <div id="map-container" style="position:relative; margin-top:-40px; margin-left:auto; margin-right:-200px; overflow:hidden; cursor:grab;">
-      <div id="svgMap" style="width:100%; height:800px; transition:transform 0.1s ease-out; transform-origin: center;"></div>
-      <div id="country-tooltip" style="display:none; position:absolute; background:#000; color:#fff; padding:6px 12px; border-radius:6px; pointer-events:none; font-size:15px; z-index:10;"></div>
-      <div class="zoom-controls" style="position:absolute; top:10px; left:10px; display:flex; flex-direction:column; gap:5px; z-index:1000;">
-        <button id="zoom-in" style="width:30px; height:30px; background:#000; color:#fff; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center;">+</button>
-        <button id="zoom-out" style="width:30px; height:30px; background:#000; color:#fff; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center;">−</button>
-        <button id="zoom-reset" style="width:30px; height:30px; background:#000; color:#fff; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:10px; display:flex; align-items:center; justify-content:center;">⌂</button>
-      </div>
+  <div id="map-container" style="position:relative; margin-top:-40px; margin-left:auto; margin-right:-200px; overflow:hidden; cursor:grab;">
+    <div id="svgMap" style="width:100%; height:800px; transition:transform 0.1s ease-out; transform-origin: center;"></div>
+    <div id="country-tooltip" style="display:none; position:absolute; background:#000; color:#fff; padding:6px 12px; border-radius:6px; pointer-events:none; font-size:15px; z-index:10;"></div>
+    <div class="zoom-controls">
+      <button id="zoom-in">+</button>
+      <button id="zoom-out">−</button>
+      <button id="zoom-reset">⌂</button>
     </div>
   </div>
-  
-    <script>
-      const mapContainer = document.getElementById('map-container');
-      const tooltip = document.getElementById('country-tooltip');
-      const svgObject = document.getElementById('svgMap');
-      
-      // Ländernamen-Mapping für die neuen IDs
-      const countryNames = {
-        'ad': 'Andorra',
-        'al': 'Albanien',
-        'am': 'Armenien',
-        'at': 'Österreich',
-        'az': 'Aserbaidschan',
-        'ba': 'Bosnien und Herzegowina',
-        'be': 'Belgien',
-        'bg': 'Bulgarien',
-        'by': 'Weißrussland',
-        'ch': 'Schweiz',
-        'cy': 'Zypern',
-        'cz': 'Tschechien',
-        'de': 'Deutschland',
-        'dk': 'Dänemark',
-        'ee': 'Estland',
-        'es': 'Spanien',
-        'fi': 'Finnland',
-        'fr': 'Frankreich',
-        'gb': 'Vereinigtes Königreich',
-        'ge': 'Georgien',
-        'gr': 'Griechenland',
-        'hr': 'Kroatien',
-        'hu': 'Ungarn',
-        'ie': 'Irland',
-        'is': 'Island',
-        'it': 'Italien',
-        'li': 'Liechtenstein',
-        'lt': 'Litauen',
-        'lu': 'Luxemburg',
-        'lv': 'Lettland',
-        'mc': 'Monaco',
-        'md': 'Moldau',
-        'me': 'Montenegro',
-        'mk': 'Nordmazedonien',
-        'mt': 'Malta',
-        'nl': 'Niederlande',
-        'no': 'Norwegen',
-        'pl': 'Polen',
-        'pt': 'Portugal',
-        'ro': 'Rumänien',
-        'rs': 'Serbien',
-        'ru': 'Russland',
-        'se': 'Schweden',
-        'si': 'Slowenien',
-        'sk': 'Slowakei',
-        'sm': 'San Marino',
-        'tr': 'Türkei',
-        'ua': 'Ukraine',
-        'va': 'Vatikan',
-        'gl': 'Grönland'
-      };
-      
-      // Zoom und Pan Variablen
-      let scale = 1.5;
-      let translateX = 100; // Karte nach rechts verschieben
-      let translateY = 0;
-      let isDragging = false;
-      let lastMouseX = 0;
-      let lastMouseY = 0;
-      
-      // Zoom Controls
-      const zoomInBtn = document.getElementById('zoom-in');
-      const zoomOutBtn = document.getElementById('zoom-out');
-      const zoomResetBtn = document.getElementById('zoom-reset');
-      
-      function updateTransform() {
-        // Dynamische Grenzen basierend auf Zoom-Level
-        // Schon ab Zoom 1.4 Bewegung erlauben, mehr bei höherem Zoom
-        const maxMoveX = Math.max(0, (scale - 1.2) * 120); // Horizontale Bewegung
-        const maxMoveY = Math.max(0, (scale - 1.2) * 150); // Vertikale Bewegung (mehr erlaubt)
-        
-        // Grenzen anwenden - erlaubt Bewegung beim Zoomen
-        translateX = Math.max(-maxMoveX + 100, Math.min(maxMoveX + 100, translateX)); // +100 für Rechtsverschiebung
-        translateY = Math.max(-maxMoveY, Math.min(maxMoveY, translateY)); // Mehr vertikale Bewegung
-        
-        svgObject.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+
+  <script>
+    const mapContainer = document.getElementById('map-container');
+    const tooltip = document.getElementById('country-tooltip');
+    const svgObject = document.getElementById('svgMap');
+
+    const countryNames = {
+      'ad': 'Andorra',
+      'al': 'Albanien',
+      'am': 'Armenien',
+      'at': 'Österreich',
+      'az': 'Aserbaidschan',
+      'ba': 'Bosnien und Herzegowina',
+      'be': 'Belgien',
+      'bg': 'Bulgarien',
+      'by': 'Weißrussland',
+      'ch': 'Schweiz',
+      'cy': 'Zypern',
+      'cz': 'Tschechien',
+      'de': 'Deutschland',
+      'dk': 'Dänemark',
+      'ee': 'Estland',
+      'es': 'Spanien',
+      'fi': 'Finnland',
+      'fr': 'Frankreich',
+      'gb': 'Vereinigtes Königreich',
+      'ge': 'Georgien',
+      'gr': 'Griechenland',
+      'hr': 'Kroatien',
+      'hu': 'Ungarn',
+      'ie': 'Irland',
+      'is': 'Island',
+      'it': 'Italien',
+      'li': 'Liechtenstein',
+      'lt': 'Litauen',
+      'lu': 'Luxemburg',
+      'lv': 'Lettland',
+      'mc': 'Monaco',
+      'md': 'Moldau',
+      'me': 'Montenegro',
+      'mk': 'Nordmazedonien',
+      'mt': 'Malta',
+      'nl': 'Niederlande',
+      'no': 'Norwegen',
+      'pl': 'Polen',
+      'pt': 'Portugal',
+      'ro': 'Rumänien',
+      'rs': 'Serbien',
+      'ru': 'Russland',
+      'se': 'Schweden',
+      'si': 'Slowenien',
+      'sk': 'Slowakei',
+      'sm': 'San Marino',
+      'tr': 'Türkei',
+      'ua': 'Ukraine',
+      'va': 'Vatikan',
+      'gl': 'Grönland'
+    };
+
+    let scale = 1.5;
+    let translateX = 100;
+    let translateY = 0;
+    let isDragging = false;
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+
+    const zoomInBtn = document.getElementById('zoom-in');
+    const zoomOutBtn = document.getElementById('zoom-out');
+    const zoomResetBtn = document.getElementById('zoom-reset');
+
+    function updateTransform() {
+      const maxMoveX = Math.max(0, (scale - 1.2) * 120);
+      const maxMoveY = Math.max(0, (scale - 1.2) * 150);
+      translateX = Math.max(-maxMoveX + 100, Math.min(maxMoveX + 100, translateX));
+      translateY = Math.max(-maxMoveY, Math.min(maxMoveY, translateY));
+      svgObject.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+    }
+
+    zoomInBtn.addEventListener('click', () => {
+      scale = Math.min(scale * 1.2, 5);
+      updateTransform();
+    });
+
+    zoomOutBtn.addEventListener('click', () => {
+      scale = Math.max(scale / 1.2, 1.3);
+      updateTransform();
+    });
+
+    zoomResetBtn.addEventListener('click', () => {
+      scale = 1.5;
+      translateX = 100;
+      translateY = 0;
+      updateTransform();
+    });
+
+    mapContainer.addEventListener('wheel', e => {
+      e.preventDefault();
+      const rect = mapContainer.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+      const oldScale = scale;
+
+      scale = e.deltaY < 0 ? Math.min(scale * 1.1, 5) : Math.max(scale / 1.1, 1.3);
+      const scaleDiff = scale - oldScale;
+
+      translateX -= (mouseX - translateX) * scaleDiff / oldScale;
+      translateY -= (mouseY - translateY) * scaleDiff / oldScale;
+
+      updateTransform();
+    });
+
+    mapContainer.addEventListener('mousedown', e => {
+      if (e.target.closest('#svgMap') || e.target.tagName === 'path') {
+        isDragging = true;
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+        mapContainer.style.cursor = 'grabbing';
+        e.preventDefault();
       }
-      
-      // Zoom Funktionen
-      zoomInBtn.addEventListener('click', function() {
-        scale = Math.min(scale * 1.2, 5);
-        updateTransform();
-      });
-      
-      zoomOutBtn.addEventListener('click', function() {
-        scale = Math.max(scale / 1.2, 1.3);
-        updateTransform();
-      });
-      
-      zoomResetBtn.addEventListener('click', function() {
-        scale = 1.5;
-        translateX = 100; // Karte nach rechts verschieben
-        translateY = 0;
-        updateTransform();
-      });
-      
-      // Mausrad Zoom
-      mapContainer.addEventListener('wheel', function(e) {
-        e.preventDefault();
-        const rect = mapContainer.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-        
-        const oldScale = scale;
-        if (e.deltaY < 0) {
-          scale = Math.min(scale * 1.1, 5);
-        } else {
-          scale = Math.max(scale / 1.1, 1.3);
-        }
-        
-        // Zoom zum Mauszeiger
-        const scaleDiff = scale - oldScale;
-        translateX -= (mouseX - translateX) * scaleDiff / oldScale;
-        translateY -= (mouseY - translateY) * scaleDiff / oldScale;
-        
-        updateTransform();
-      });
-      
-      // Drag und Drop
-      mapContainer.addEventListener('mousedown', function(e) {
-        if (e.target === svgObject || e.target.closest('#svgMap') || e.target.closest('svg') || e.target.tagName === 'path') {
-          isDragging = true;
-          lastMouseX = e.clientX;
-          lastMouseY = e.clientY;
-          mapContainer.style.cursor = 'grabbing';
-          e.preventDefault();
-        }
-      });
-      
-      document.addEventListener('mousemove', function(e) {
-        if (isDragging) {
-          const deltaX = e.clientX - lastMouseX;
-          const deltaY = e.clientY - lastMouseY;
-          
-          translateX += deltaX;
-          translateY += deltaY;
-          
-          lastMouseX = e.clientX;
-          lastMouseY = e.clientY;
-          
-          updateTransform();
-        }
-      });
-      
-      document.addEventListener('mouseup', function() {
-        if (isDragging) {
-          isDragging = false;
-          mapContainer.style.cursor = 'grab';
-        }
-      });
-      
-      // Touch Events für Mobile
-      let lastTouchDistance = 0;
-      
-      mapContainer.addEventListener('touchstart', function(e) {
-        if (e.touches.length === 1) {
-          isDragging = true;
-          lastMouseX = e.touches[0].clientX;
-          lastMouseY = e.touches[0].clientY;
-        } else if (e.touches.length === 2) {
-          lastTouchDistance = Math.hypot(
-            e.touches[0].clientX - e.touches[1].clientX,
-            e.touches[0].clientY - e.touches[1].clientY
-          );
-        }
-        e.preventDefault();
-      });
-      
-      mapContainer.addEventListener('touchmove', function(e) {
-        if (e.touches.length === 1 && isDragging) {
-          const deltaX = e.touches[0].clientX - lastMouseX;
-          const deltaY = e.touches[0].clientY - lastMouseY;
-          
-          translateX += deltaX;
-          translateY += deltaY;
-          
-          lastMouseX = e.touches[0].clientX;
-          lastMouseY = e.touches[0].clientY;
-          
-          updateTransform();
-        } else if (e.touches.length === 2) {
-          const currentDistance = Math.hypot(
-            e.touches[0].clientX - e.touches[1].clientX,
-            e.touches[0].clientY - e.touches[1].clientY
-          );
-          
-          if (lastTouchDistance > 0) {
-            const scaleChange = currentDistance / lastTouchDistance;
-            scale = Math.min(Math.max(scale * scaleChange, 1.3), 5);
-            updateTransform();
-          }
-          
-          lastTouchDistance = currentDistance;
-        }
-        e.preventDefault();
-      });
-      
-      mapContainer.addEventListener('touchend', function() {
-        isDragging = false;
-        lastTouchDistance = 0;
-      });
+    });
 
-      // SVG laden und inline einbetten
-      fetch('europe_map.svg')
-        .then(response => response.text())
-        .then(svgText => {
-          svgObject.innerHTML = svgText;
-          const svg = svgObject.querySelector('svg');
-          if (svg) {
-            svg.style.width = '100%';
-            svg.style.height = '100%';
-            svg.style.display = 'block';
-          }
-          
-          // Initiale Transformation anwenden
-          updateTransform();
-          
-          const paths = svgObject.querySelectorAll('path[id]');
+    document.addEventListener('mousemove', e => {
+      if (isDragging) {
+        translateX += e.clientX - lastMouseX;
+        translateY += e.clientY - lastMouseY;
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+        updateTransform();
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      isDragging = false;
+      mapContainer.style.cursor = 'grab';
+    });
+
+    fetch('europe_map.svg')
+      .then(response => response.text())
+      .then(svgText => {
+        svgObject.innerHTML = svgText;
+        const svg = svgObject.querySelector('svg');
+        if (svg) {
+          svg.style.width = '100%';
+          svg.style.height = '100%';
+          svg.style.display = 'block';
+        }
+        updateTransform();
+
+        const paths = svgObject.querySelectorAll('path[id]');
         paths.forEach(path => {
-            const countryId = path.getAttribute('id');
-            const countryName = countryNames[countryId] || countryId.toUpperCase();
-            
-            // CSS Styling für Länder
-            path.style.fill = '#c0c0c0';
-            path.style.stroke = '#fff';
-            path.style.strokeWidth = '0.4';
-            path.style.cursor = 'pointer';
-            path.style.transition = 'fill 0.2s ease';
-            
-          path.addEventListener('mouseenter', function(e) {
-              if (!isDragging) {
-                this.style.fill = '#4CAF50';
-                tooltip.textContent = countryName;
-            tooltip.style.display = 'block';
-              }
+          const countryId = path.getAttribute('id');
+          const countryName = countryNames[countryId] || countryId.toUpperCase();
+          path.style.fill = '#111';
+          path.style.stroke = '#aaa';
+          path.style.strokeWidth = '0.3';
+          path.style.cursor = 'pointer';
+          path.style.transition = 'fill 0.2s ease';
+
+          path.addEventListener('mouseenter', function () {
+            if (!isDragging) {
+              this.style.fill = '#4CAF50';
+              tooltip.textContent = countryName;
+              tooltip.style.display = 'block';
+            }
           });
-          path.addEventListener('mousemove', function(e) {
-              if (!isDragging) {
-            tooltip.style.left = (e.clientX - mapContainer.getBoundingClientRect().left + 10) + 'px';
-            tooltip.style.top = (e.clientY - mapContainer.getBoundingClientRect().top + 10) + 'px';
-              }
+
+          path.addEventListener('mousemove', function (e) {
+            if (!isDragging) {
+              tooltip.style.left = `${e.clientX - mapContainer.getBoundingClientRect().left + 10}px`;
+              tooltip.style.top = `${e.clientY - mapContainer.getBoundingClientRect().top + 10}px`;
+            }
           });
-          path.addEventListener('mouseleave', function() {
-              this.style.fill = '#c0c0c0';
+
+          path.addEventListener('mouseleave', function () {
+            this.style.fill = '#111';
             tooltip.style.display = 'none';
-            });
           });
-        })
-        .catch(error => {
-          console.error('Fehler beim Laden der SVG:', error);
-      });
-    </script>
-  </div>
+        });
+      })
+      .catch(error => console.error('Fehler beim Laden der SVG:', error));
+  </script>
 </body>
-</html> 
+</html>

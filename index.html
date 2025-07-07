@@ -1,87 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>About – Global Garden</title>
+<head>
+  <meta charset="UTF-8" />
+  <title>Global Garden – Discover</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
       margin: 0;
       padding: 0;
-      background: #000;
-      color: #f0f0f0;
-      font-family: sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
-
-    .container {
-      max-width: 700px;
-      padding: 40px;
+      background: radial-gradient(circle at center, #000 0%, #111 100%);
+      color: #fff;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
       text-align: center;
     }
 
-    h1 {
-      font-size: 24px;
-      margin-bottom: 24px;
-    }
-
-    p {
-      line-height: 1.6;
-      font-size: 15px;
-      margin-bottom: 16px;
-      color: #ccc;
-    }
-
-    a.back-button {
-      display: inline-block;
-      margin-top: 30px;
-      padding: 10px 20px;
-      background: #111;
-      border: 1px solid #444;
+    .logo {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 18px;
       color: #fff;
-      border-radius: 5px;
       text-decoration: none;
-      transition: background 0.3s ease;
+      font-weight: bold;
+      letter-spacing: 1px;
     }
 
-    a.back-button:hover {
+    .logo:hover {
+      opacity: 0.8;
+    }
+
+    .info-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #111;
+      color: #fff;
+      padding: 8px 16px;
+      border: 1px solid #444;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .info-button:hover {
       background: #333;
     }
 
-    a.external-link {
-      color: #4da6ff;
-      text-decoration: none;
+    .hero {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 0 20px;
     }
 
-    a.external-link:hover {
-      text-decoration: underline;
+    .hero h1 {
+      font-size: 48px;
+      line-height: 1.3;
+      font-weight: 400;
+      margin: 0 0 40px 0;
+    }
+
+    .hero h1 span {
+      color: #ffffff;
+    }
+
+    .hero a.button {
+      display: inline-block;
+      padding: 14px 36px;
+      border: 1px solid #fff;
+      border-radius: 30px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 16px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .hero a.button:hover {
+      background: #fff;
+      color: #000;
+    }
+
+    .scroll-down {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      opacity: 0.8;
+    }
+
+    .scroll-down svg {
+      margin-top: 8px;
+      width: 24px;
+      height: 24px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(6px); }
+    }
+
+    section {
+      padding: 100px 20px; /* Mehr Luft oben/unten */
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    section h2 {
+      font-size: 32px;
+      margin-bottom: 20px;
+    }
+
+    section p {
+      font-size: 18px;
+      line-height: 1.6;
+      color: #ccc;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .features {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 40px; /* Mehr Abstand zwischen Boxen */
+      text-align: center;
+      margin-top: 50px; /* Mehr Abstand zwischen Text & Boxen */
+    }
+
+    .feature {
+      flex: 1 1 250px;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 30px 20px;
+      background: rgba(255,255,255,0.02);
+    }
+
+    .feature h3 {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .feature p {
+      font-size: 16px;
+      color: #bbb;
     }
   </style>
-  </head>
-  <body>
-  <div class="container">
-    <h1>The Global Garden</h1>
+</head>
+<body>
+  <a href="#" class="logo">Global Garden</a>
+  <a href="src/public/info.html" class="info-button">Info</a>
 
-    <p>
-      The Global Garden is a data-driven visual art and information project that makes the state of our planet visible in an intuitive way. Every country in the world is represented by a unique digital flower — its shape, color and growth pattern are based on real environmental data.
-    </p>
-
-    <p>
-      The data used comes from the UN Sustainable Development Goals (SDG) database and focuses on key sustainability indicators such as CO₂ emissions per capita, renewable energy share, water consumption, biodiversity, air quality, waste generation and environmental transparency.
-    </p>
-
-    <p>
-      The aim is to translate complex sustainability data into a visual, poetic form that sparks awareness and encourages reflection. The data is publicly accessible and can be explored in full via the UN Statistics Division:
-      <br />
-      <a class="external-link" href="https://unstats.un.org/sdgs/indicators/database/" target="_blank">
-        → unstats.un.org/sdgs/indicators/database
-      </a>
-    </p>
-
-    <a href="src/public/homescreen.html" class="back-button">Start →</a>
+  <div class="hero">
+    <h1>
+      Discover the <span>Global Garden</span><br>
+      and see how our world blooms<br>
+      through real environmental data.
+    </h1>
+    <a class="button" href="src/public/homescreen.html">Start Exploring</a>
   </div>
-  </body>
-</html> 
+
+  <div class="scroll-down">
+    Scroll Down
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+  </div>
+
+  <!-- About + Features in einer Section mit mehr Space -->
+  <section class="about">
+    <h2>About the Project</h2>
+    <p>
+      Global Garden is a digital world map where each country is represented by a unique flower.
+      The shape, color, and growth of each bloom are based on real environmental factors like CO₂ emissions,
+      biodiversity, or renewable energy usage.
+    </p>
+
+    <div class="features">
+      <div class="feature">
+        <h3>150+ Countries</h3>
+        <p>Visualized with real, up-to-date climate data.</p>
+      </div>
+      <div class="feature">
+        <h3>Dynamic Flowers</h3>
+        <p>Each flower grows and changes based on real indicators.</p>
+      </div>
+      <div class="feature">
+        <h3>Explore Freely</h3>
+        <p>Zoom, drag, and discover details in an interactive map.</p>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
