@@ -47,4 +47,4 @@ const airData = {
   "Norway": { air: 6.1 },
   "United Kingdom": { air: 9.9 },
 };
-export default airData;
+// Export removed for p5.js compatibility

@@ -35,4 +35,4 @@ const wasteData = {
     "Finland": { plasticWaste: 0.47 },
     "United Kingdom": { plasticWaste: 0.44 },
 };
-export default wasteData;
+// Export removed for p5.js compatibility

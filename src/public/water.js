@@ -46,4 +46,4 @@ const waterData = {
     "Serbia": { water: 468.9 },
     "Slovenia": { water: 559.0 },
 };
-export default waterData;
+// Export removed for p5.js compatibility

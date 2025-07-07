@@ -45,4 +45,4 @@ const biodiversityData = {
     "Serbia": { kba_pct: 31.6 },
     "United Kingdom": { kba_pct: 83.4 },
 };
-export default biodiversityData;
+// Export removed for p5.js compatibility

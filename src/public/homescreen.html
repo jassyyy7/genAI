@@ -82,13 +82,13 @@
     <div class="legend">
       <h3>Environmental Indicators:</h3>
       <ul>
-        <li><span style="background-color: #ff0000;"></span> High CO₂ emissions</li>
-        <li><span style="background-color: #00c864;"></span> Share of renewable energy</li>
-        <li><span style="background-color: #0090ff;"></span> Water consumption</li>
-        <li><span style="background-color: #ffee00;"></span> Air quality</li>
+        <li><span style="background-color: #ff0000;"></span> Low CO₂</li>
+        <li><span style="background-color: #00c864;"></span> Renewables</li>
+        <li><span style="background-color: #0090ff;"></span> Low Water</li>
+        <li><span style="background-color: #ffee00;"></span> Clean Air</li>
         <li><span style="background-color: #b000ff;"></span> Biodiversity</li>
-        <li><span style="background-color: #ffa500;"></span> Waste per capita</li>
-        <li><span style="background-color: #ffffff;"></span> Environmental transparency</li>
+        <li><span style="background-color: #ffa500;"></span> Low Waste</li>
+        <li><span style="background-color: #ffffff;"></span> Transparency</li>
       </ul>
     </div>
 
@@ -100,10 +100,10 @@
     <div id="map-container" style="position:relative; margin-top:-40px; margin-left:auto; margin-right:-200px; overflow:hidden; cursor:grab;">
       <div id="svgMap" style="width:100%; height:800px; transition:transform 0.1s ease-out; transform-origin: center;"></div>
       <div id="country-tooltip" style="display:none; position:absolute; background:#000; color:#fff; padding:6px 12px; border-radius:6px; pointer-events:none; font-size:15px; z-index:10;"></div>
-      <div class="zoom-controls" style="position:absolute; top:10px; left:10px; display:flex; flex-direction:column; gap:5px; z-index:1000;">
-        <button id="zoom-in" style="width:30px; height:30px; background:#000; color:#fff; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center;">+</button>
-        <button id="zoom-out" style="width:30px; height:30px; background:#000; color:#fff; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center;">−</button>
-        <button id="zoom-reset" style="width:30px; height:30px; background:#000; color:#fff; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:10px; display:flex; align-items:center; justify-content:center;">⌂</button>
+      <div class="zoom-controls" style="position:absolute; top:20px; left:240px; display:flex; flex-direction:column; gap:8px; z-index:1000;">
+        <button id="zoom-in" style="width:38px; height:38px; background:#000; color:#fff; border:1px solid #333; border-radius:6px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center;">+</button>
+        <button id="zoom-out" style="width:38px; height:38px; background:#000; color:#fff; border:1px solid #333; border-radius:6px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center;">−</button>
+        <button id="zoom-reset" style="width:38px; height:38px; background:#000; color:#fff; border:1px solid #333; border-radius:6px; cursor:pointer; font-size:12px; display:flex; align-items:center; justify-content:center;">⌂</button>
       </div>
     </div>
   </div>
@@ -116,55 +116,55 @@
       // Ländernamen-Mapping für die neuen IDs
       const countryNames = {
         'ad': 'Andorra',
-        'al': 'Albanien',
-        'am': 'Armenien',
-        'at': 'Österreich',
-        'az': 'Aserbaidschan',
-        'ba': 'Bosnien und Herzegowina',
-        'be': 'Belgien',
-        'bg': 'Bulgarien',
-        'by': 'Weißrussland',
-        'ch': 'Schweiz',
-        'cy': 'Zypern',
-        'cz': 'Tschechien',
-        'de': 'Deutschland',
-        'dk': 'Dänemark',
-        'ee': 'Estland',
-        'es': 'Spanien',
-        'fi': 'Finnland',
-        'fr': 'Frankreich',
-        'gb': 'Vereinigtes Königreich',
-        'ge': 'Georgien',
-        'gr': 'Griechenland',
-        'hr': 'Kroatien',
-        'hu': 'Ungarn',
-        'ie': 'Irland',
-        'is': 'Island',
-        'it': 'Italien',
+        'al': 'Albania',
+        'am': 'Armenia',
+        'at': 'Austria',
+        'az': 'Azerbaijan',
+        'ba': 'Bosnia and Herzegovina',
+        'be': 'Belgium',
+        'bg': 'Bulgaria',
+        'by': 'Belarus',
+        'ch': 'Switzerland',
+        'cy': 'Cyprus',
+        'cz': 'Czechia',
+        'de': 'Germany',
+        'dk': 'Denmark',
+        'ee': 'Estonia',
+        'es': 'Spain',
+        'fi': 'Finland',
+        'fr': 'France',
+        'gb': 'United Kingdom',
+        'ge': 'Georgia',
+        'gr': 'Greece',
+        'hr': 'Croatia',
+        'hu': 'Hungary',
+        'ie': 'Ireland',
+        'is': 'Iceland',
+        'it': 'Italy',
         'li': 'Liechtenstein',
-        'lt': 'Litauen',
-        'lu': 'Luxemburg',
-        'lv': 'Lettland',
+        'lt': 'Lithuania',
+        'lu': 'Luxembourg',
+        'lv': 'Latvia',
         'mc': 'Monaco',
-        'md': 'Moldau',
+        'md': 'Moldova',
         'me': 'Montenegro',
-        'mk': 'Nordmazedonien',
+        'mk': 'North Macedonia',
         'mt': 'Malta',
-        'nl': 'Niederlande',
-        'no': 'Norwegen',
-        'pl': 'Polen',
+        'nl': 'Netherlands',
+        'no': 'Norway',
+        'pl': 'Poland',
         'pt': 'Portugal',
-        'ro': 'Rumänien',
-        'rs': 'Serbien',
-        'ru': 'Russland',
-        'se': 'Schweden',
-        'si': 'Slowenien',
-        'sk': 'Slowakei',
+        'ro': 'Romania',
+        'rs': 'Serbia',
+        'ru': 'Russia',
+        'se': 'Sweden',
+        'si': 'Slovenia',
+        'sk': 'Slovakia',
         'sm': 'San Marino',
-        'tr': 'Türkei',
+        'tr': 'Turkey',
         'ua': 'Ukraine',
-        'va': 'Vatikan',
-        'gl': 'Grönland'
+        'va': 'Vatican',
+        'gl': 'Greenland'
       };
       
       // Zoom und Pan Variablen
@@ -338,9 +338,9 @@
             const countryName = countryNames[countryId] || countryId.toUpperCase();
             
             // CSS Styling für Länder
-            path.style.fill = '#c0c0c0';
+            path.style.fill = '#111111';
             path.style.stroke = '#fff';
-            path.style.strokeWidth = '0.4';
+            path.style.strokeWidth = '0.3';
             path.style.cursor = 'pointer';
             path.style.transition = 'fill 0.2s ease';
             
@@ -358,8 +358,17 @@
               }
           });
           path.addEventListener('mouseleave', function() {
-              this.style.fill = '#c0c0c0';
+              this.style.fill = '#111111';
             tooltip.style.display = 'none';
+            });
+            
+            // Klick-Event für Navigation zur Blumen-Ansicht
+            path.addEventListener('click', function(e) {
+              if (!isDragging) {
+                // Parameter für das geklickte Land zur URL hinzufügen
+                const selectedCountry = encodeURIComponent(countryName);
+                window.location.href = `index.html?country=${selectedCountry}`;
+              }
             });
           });
         })
