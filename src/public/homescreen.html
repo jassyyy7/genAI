@@ -44,7 +44,7 @@
     }
     .center-box {
       text-align: center;
-      background: rgba(30,30,30,0.95);
+      background: rgba(0,0,0,0.95);
       padding: 48px 36px;
       border-radius: 16px;
       box-shadow: 0 4px 32px #0008;
@@ -68,7 +68,6 @@
   </style>
 </head>
 <body>
-  <div class="center-box">
     <!-- ⬅️ Titelbereich oben links -->
     <div class="title-box">
       <h1>Global Garden</h1>
@@ -96,15 +95,19 @@
     <!-- ➕ Info-Button oben rechts -->
     <a href="info.html" class="info-button">Info</a>
 
+  <div class="center-box">
+
     <div id="map-container" style="position:relative; margin-top:-40px; margin-left:auto; margin-right:-200px; overflow:hidden; cursor:grab;">
       <div id="svgMap" style="width:100%; height:800px; transition:transform 0.1s ease-out; transform-origin: center;"></div>
-      <div id="country-tooltip" style="display:none; position:absolute; background:#222; color:#fff; padding:6px 12px; border-radius:6px; pointer-events:none; font-size:15px; z-index:10;"></div>
+      <div id="country-tooltip" style="display:none; position:absolute; background:#000; color:#fff; padding:6px 12px; border-radius:6px; pointer-events:none; font-size:15px; z-index:10;"></div>
       <div class="zoom-controls" style="position:absolute; top:10px; left:10px; display:flex; flex-direction:column; gap:5px; z-index:1000;">
-        <button id="zoom-in" style="width:30px; height:30px; background:#444; color:#fff; border:1px solid #666; border-radius:4px; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center;">+</button>
-        <button id="zoom-out" style="width:30px; height:30px; background:#444; color:#fff; border:1px solid #666; border-radius:4px; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center;">−</button>
-        <button id="zoom-reset" style="width:30px; height:30px; background:#444; color:#fff; border:1px solid #666; border-radius:4px; cursor:pointer; font-size:10px; display:flex; align-items:center; justify-content:center;">⌂</button>
+        <button id="zoom-in" style="width:30px; height:30px; background:#000; color:#fff; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center;">+</button>
+        <button id="zoom-out" style="width:30px; height:30px; background:#000; color:#fff; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center;">−</button>
+        <button id="zoom-reset" style="width:30px; height:30px; background:#000; color:#fff; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:10px; display:flex; align-items:center; justify-content:center;">⌂</button>
       </div>
     </div>
+  </div>
+  
     <script>
       const mapContainer = document.getElementById('map-container');
       const tooltip = document.getElementById('country-tooltip');
@@ -166,7 +169,7 @@
       
       // Zoom und Pan Variablen
       let scale = 1.5;
-      let translateX = 0;
+      let translateX = 100; // Karte nach rechts verschieben
       let translateY = 0;
       let isDragging = false;
       let lastMouseX = 0;
@@ -178,13 +181,14 @@
       const zoomResetBtn = document.getElementById('zoom-reset');
       
       function updateTransform() {
-        // Einfache, feste Grenzen basierend auf Zoom-Level
-        // Bei scale 1.5 sollte die Karte nicht zu weit verschoben werden können
-        const maxMove = Math.max(0, (scale - 1) * 200); // 200px pro Zoom-Stufe
+        // Dynamische Grenzen basierend auf Zoom-Level
+        // Schon ab Zoom 1.4 Bewegung erlauben, mehr bei höherem Zoom
+        const maxMoveX = Math.max(0, (scale - 1.2) * 120); // Horizontale Bewegung
+        const maxMoveY = Math.max(0, (scale - 1.2) * 150); // Vertikale Bewegung (mehr erlaubt)
         
-        // Grenzen anwenden - einfach und zuverlässig
-        translateX = Math.max(-maxMove, Math.min(maxMove, translateX));
-        translateY = Math.max(-maxMove, Math.min(maxMove, translateY));
+        // Grenzen anwenden - erlaubt Bewegung beim Zoomen
+        translateX = Math.max(-maxMoveX + 100, Math.min(maxMoveX + 100, translateX)); // +100 für Rechtsverschiebung
+        translateY = Math.max(-maxMoveY, Math.min(maxMoveY, translateY)); // Mehr vertikale Bewegung
         
         svgObject.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
       }
@@ -196,13 +200,13 @@
       });
       
       zoomOutBtn.addEventListener('click', function() {
-        scale = Math.max(scale / 1.2, 0.8);
+        scale = Math.max(scale / 1.2, 1.3);
         updateTransform();
       });
       
       zoomResetBtn.addEventListener('click', function() {
         scale = 1.5;
-        translateX = 0;
+        translateX = 100; // Karte nach rechts verschieben
         translateY = 0;
         updateTransform();
       });
@@ -218,7 +222,7 @@
         if (e.deltaY < 0) {
           scale = Math.min(scale * 1.1, 5);
         } else {
-          scale = Math.max(scale / 1.1, 0.8);
+          scale = Math.max(scale / 1.1, 1.3);
         }
         
         // Zoom zum Mauszeiger
@@ -299,7 +303,7 @@
           
           if (lastTouchDistance > 0) {
             const scaleChange = currentDistance / lastTouchDistance;
-            scale = Math.min(Math.max(scale * scaleChange, 0.8), 5);
+            scale = Math.min(Math.max(scale * scaleChange, 1.3), 5);
             updateTransform();
           }
           

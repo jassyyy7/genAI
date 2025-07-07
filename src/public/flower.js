@@ -73,12 +73,12 @@ function initFlowerLayers(countryName) {
     return {
       label: l.label,
       color: l.color,
-      baseRadius: lerp(200, 700, l.value), // Radius je nach Umweltwert
+      baseRadius: lerp(300, 800, l.value), // Radius je nach Umweltwert (größer)
       noiseMax: lerp(1.5, 3.5, l.value),   // Unregelmäßigkeit
       rotateSpeed: 0.05 * (i % 2 === 0 ? 1 : -1), // Rotation im Wechsel
       growth: 0,
-      targetGrowth: lerp(200, 700, l.value), // Endgröße
-      delay: i * 80 // Zeitliche Verzögerung
+      targetGrowth: lerp(300, 800, l.value), // Endgröße (größer)
+      delay: i * 50 // Kürzere Verzögerung (statt 80)
     };
   });
 
@@ -97,9 +97,9 @@ function drawBlendedLayers() {
   ctx.shadowColor = "transparent";
   ctx.shadowBlur = 0;
 
-  // Erste Schicht sofort starten
+  // Erste Schicht sofort starten (schneller)
   if (layers[0].growth < layers[0].targetGrowth) {
-    layers[0].growth += 1.2;
+    layers[0].growth += 3.0; // Viel schneller als 1.2
   }
 
   // Alle Schichten nacheinander wachsen lassen und ineinander überblenden
@@ -109,7 +109,7 @@ function drawBlendedLayers() {
 
     if (frameCount - startFrame > l2.delay) {
       if (l2.growth < l2.targetGrowth) {
-        l2.growth += 0.8;
+        l2.growth += 2.5; // Viel schneller als 0.8
       }
     }
 
@@ -137,9 +137,21 @@ function drawInterpolatedLayer(layer) {
     let xoff = map(sinVal[a], -1, 1, 0, layer.noiseMax);
     let yoff = map(cosVal[a], -1, 1, 0, layer.noiseMax);
     let n = pow(noise(xoff, yoff, frameCount * 0.005), 2); // weichere Wellen
-    let r = map(n, 0, 1, layer.growth * 0.4, layer.growth * 1.2);
-    let x = r * cos(a);
-    let y = r * sin(a);
+    
+    // Abstrakte spitze Form - unregelmäßige Spitzen (weniger scharf)
+    let spikeFactor = sin(a * 3.7) * cos(a * 2.3) * sin(a * 5.1); // Komplexe Frequenzen für Unregelmäßigkeit
+    spikeFactor = pow(abs(spikeFactor), 1.0); // Weniger scharf als vorher
+    
+    // Zusätzliche Schärfe durch Noise-basierte Spitzen (reduziert)
+    let sharpNoise = noise(a * 0.1, frameCount * 0.01);
+    sharpNoise = pow(sharpNoise, 1.8); // Weniger scharfe Spitzen
+    
+    // Basis-Radius mit spitzer Modulation (gemäßigter)
+    let baseRadius = map(n, 0, 1, layer.growth * 0.4, layer.growth * 1.2);
+    let spikeRadius = baseRadius * (0.5 + 0.6 * spikeFactor + 0.4 * sharpNoise);
+    
+    let x = spikeRadius * cos(a);
+    let y = spikeRadius * sin(a);
     vertex(x, y);
   }
   endShape(CLOSE);
