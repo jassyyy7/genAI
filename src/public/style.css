@@ -110,3 +110,28 @@ canvas {
   background: #333;
   color: #fff;
 }
+
+/* Style für den dynamischen Green Score Badge */
+.score-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 13px;
+  margin-left: 6px;
+}
+
+.score-badge.green {
+  background: #2ecc71; /* Sattes Grün */
+  color: #000;
+}
+
+.score-badge.medium {
+  background: #f1c40f; /* Gelb */
+  color: #000;
+}
+
+.score-badge.low {
+  background: #e74c3c; /* Rot */
+  color: #fff;
+}

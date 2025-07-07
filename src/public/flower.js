@@ -6,10 +6,10 @@ let centerX, centerY;
 let currentCountry = "";
 let combinedData = {};
 
-// Mapping von deutschen zu englischen Ländernamen
+// --- Mapping Deutsch → Englisch ---
 const countryMapping = {
   "Deutschland": "Germany",
-  "Frankreich": "France", 
+  "Frankreich": "France",
   "Spanien": "Spain",
   "Italien": "Italy",
   "Österreich": "Austria",
@@ -60,22 +60,15 @@ const countryMapping = {
   "Vatikan": "Vatican"
 };
 
-// URL-Parameter auslesen
+// --- Helpers ---
 function getURLParameter(name) {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get(name);
 }
 
-// Land-Name von Deutsch zu Englisch konvertieren
-function getEnglishCountryName(germanName) {
-  return countryMapping[germanName] || germanName;
-}
-
-// Daten kombinieren - mit Fehlerbehandlung
 function combineCountryData() {
   console.log("Combining country data...");
-  
-  // Fallback für fehlende Daten-Objekte
+
   const safeAirData = typeof airData !== 'undefined' ? airData : {};
   const safeBiodiversityData = typeof biodiversityData !== 'undefined' ? biodiversityData : {};
   const safeCountryData = typeof countryData !== 'undefined' ? countryData : {};
@@ -83,7 +76,6 @@ function combineCountryData() {
   const safeWasteData = typeof wasteData !== 'undefined' ? wasteData : {};
   const safeWaterData = typeof waterData !== 'undefined' ? waterData : {};
 
-  // Alle verfügbaren Länder sammeln
   const allCountries = new Set([
     ...Object.keys(safeAirData),
     ...Object.keys(safeBiodiversityData),
@@ -93,9 +85,6 @@ function combineCountryData() {
     ...Object.keys(safeWaterData)
   ]);
 
-  console.log("Found countries:", allCountries.size);
-
-  // Für jedes Land die Daten kombinieren
   allCountries.forEach(country => {
     combinedData[country] = {
       co2: safeCountryData[country]?.co2 || 5.0,
@@ -107,16 +96,15 @@ function combineCountryData() {
       transparency: 50
     };
   });
-  
+
   console.log("Combined data for", Object.keys(combinedData).length, "countries");
 }
 
+// --- p5.js ---
 function setup() {
   console.log("🌸 Setting up flower visualization...");
-  
-  // Daten kombinieren
+
   combineCountryData();
-  
   createCanvas(windowWidth, windowHeight);
   angleMode(DEGREES);
   background("#000000");
@@ -124,171 +112,122 @@ function setup() {
   centerY = height / 2;
   noFill();
 
-  console.log("Canvas created:", width, "x", height);
-
-  // Sinus- und Kosinuswerte vorab berechnen (für Performance)
   for (let i = 0; i < 360; i++) {
     sinVal[i] = sin(i);
     cosVal[i] = cos(i);
   }
 
-  // Land aus URL-Parameter lesen (bereits auf Englisch)
   const selectedCountry = getURLParameter('country') || 'Germany';
-  console.log("Selected country:", selectedCountry);
-  
   initFlowerLayers(selectedCountry);
 }
 
-function initFlowerLayers(englishCountryName, displayName) {
-  currentCountry = englishCountryName; // Immer englischer Name
-  console.log("Initializing flower for:", englishCountryName);
-  
-  // Prüfen ob Daten für das Land vorhanden sind
+function initFlowerLayers(englishCountryName) {
+  currentCountry = englishCountryName;
+
   if (!combinedData[englishCountryName]) {
-    console.warn(`No data for ${englishCountryName}, using Germany as fallback`);
+    console.warn(`No data for ${englishCountryName}, fallback to Germany`);
     englishCountryName = 'Germany';
     currentCountry = 'Germany';
   }
-  
-  // Falls auch Deutschland nicht existiert, verwende Dummy-Daten
+
   const data = combinedData[englishCountryName] || {
-    co2: 7.0,
-    air: 12.0,
-    biodiversity: 65.0,
-    renewables: 25.0,
-    waste: 2.0,
-    water: 400.0,
-    transparency: 50
+    co2: 7.0, air: 12.0, biodiversity: 65.0, renewables: 25.0, waste: 2.0, water: 400.0, transparency: 50
   };
 
-  console.log("Using data for", englishCountryName, ":", data);
-
-  // Normalisierte Werte berechnen (0-1 Skala, wobei höhere Werte = größere Probleme)
+  // --- Green Score ---
   const normalizedValues = {
-    co2: Math.min(data.co2 / 15, 1),              // 0-15t CO2 -> 0-1
-    air: Math.min(data.air / 30, 1),              // 0-30 Luftqualität -> 0-1  
-    water: Math.min(data.water / 1000, 1),        // 0-1000L Wasser -> 0-1
-    waste: Math.min(data.waste / 25, 1),          // 0-25kg Abfall -> 0-1
-    biodiversityLoss: Math.min((100 - data.biodiversity) / 80, 1), // Biodiversitätsverlust
-    renewablesLack: Math.min((100 - data.renewables) / 80, 1),     // Mangel an Erneuerbaren
-    transparency: Math.min((100 - data.transparency) / 100, 1)     // Mangel an Transparenz
+    co2: 1 - Math.min(data.co2 / 15, 1),
+    air: Math.min(data.air / 30, 1),
+    water: 1 - Math.min(data.water / 1000, 1),
+    waste: 1 - Math.min(data.waste / 25, 1),
+    biodiversity: Math.min(data.biodiversity / 100, 1),
+    renewables: Math.min(data.renewables / 100, 1),
+    transparency: Math.min(data.transparency / 100, 1)
   };
 
-  console.log("Normalized values:", normalizedValues);
+  const greenScore = (
+    normalizedValues.co2 +
+    normalizedValues.air +
+    normalizedValues.water +
+    normalizedValues.waste +
+    normalizedValues.biodiversity +
+    normalizedValues.renewables +
+    normalizedValues.transparency
+  ) / 7;
 
-  // Umweltkategorien mit proportionalen Größen basierend auf Werten
-  let rawLayers = [
-    {
-      label: `Low CO₂: ${data.co2}t`,
-      value: normalizedValues.co2,
-      intensity: normalizedValues.co2, // Wie stark diese Kategorie ausgeprägt ist
-      color: color(255, 0, 0, 120), // Rot
-      baseRadius: 200 // Minimaler Radius
-    },
-    {
-      label: `Clean Air: ${data.air}`,
-      value: normalizedValues.air,
-      intensity: normalizedValues.air,
-      color: color(255, 255, 0, 120), // Gelb
-      baseRadius: 200
-    },
-    {
-      label: `Low Water: ${data.water} L`,
-      value: normalizedValues.water,
-      intensity: normalizedValues.water,
-      color: color(0, 150, 255, 120), // Blau
-      baseRadius: 200
-    },
-    {
-      label: `Low Waste: ${data.waste} kg`,
-      value: normalizedValues.waste,
-      intensity: normalizedValues.waste,
-      color: color(255, 165, 0, 120), // Orange
-      baseRadius: 200
-    },
-    {
-      label: `Biodiversity: ${data.biodiversity.toFixed(1)}%`,
-      value: normalizedValues.biodiversityLoss,
-      intensity: normalizedValues.biodiversityLoss,
-      color: color(180, 0, 255, 120), // Lila
-      baseRadius: 200
-    },
-    {
-      label: `Renewables: ${data.renewables.toFixed(1)}%`,
-      value: normalizedValues.renewablesLack,
-      intensity: normalizedValues.renewablesLack,
-      color: color(0, 200, 100, 120), // Grün (invertiert)
-      baseRadius: 200
-    },
-    {
-      label: `Transparency: ${data.transparency}`,
-      value: normalizedValues.transparency,
-      intensity: normalizedValues.transparency,
-      color: color(255, 255, 255, 80), // Weiß, transparenter
-      baseRadius: 200
+  const greenScorePercent = (greenScore * 100).toFixed(1);
+
+  if (document.getElementById("country-name")) {
+    document.getElementById("country-name").innerText = englishCountryName;
+  }
+
+  const badge = document.getElementById("green-score");
+  if (badge) {
+    badge.innerText = `${greenScorePercent}%`;
+    badge.classList.remove("green", "medium", "low");
+    if (greenScore >= 0.75) {
+      badge.classList.add("green");
+    } else if (greenScore >= 0.5) {
+      badge.classList.add("medium");
+    } else {
+      badge.classList.add("low");
     }
+  }
+
+  console.log(`🌿 ${englishCountryName} → Green Score: ${greenScorePercent}%`);
+
+  // --- Layers ---
+  let rawLayers = [
+    { label: `Low CO₂: ${data.co2}t`, intensity: 1 - normalizedValues.co2, color: color(255, 0, 0, 120) },
+    { label: `Clean Air: ${data.air}`, intensity: 1 - normalizedValues.air, color: color(255, 255, 0, 120) },
+    { label: `Low Water: ${data.water} L`, intensity: 1 - normalizedValues.water, color: color(0, 150, 255, 120) },
+    { label: `Low Waste: ${data.waste} kg`, intensity: 1 - normalizedValues.waste, color: color(255, 165, 0, 120) },
+    { label: `Biodiversity: ${data.biodiversity.toFixed(1)}%`, intensity: 1 - normalizedValues.biodiversity, color: color(180, 0, 255, 120) },
+    { label: `Renewables: ${data.renewables.toFixed(1)}%`, intensity: 1 - normalizedValues.renewables, color: color(0, 200, 100, 120) },
+    { label: `Transparency: ${data.transparency}`, intensity: 1 - normalizedValues.transparency, color: color(255, 255, 255, 80) }
   ];
 
-  // Sortierung: stärkste Probleme (höchste Intensität) zuerst = äußerste Schicht
   rawLayers.sort((a, b) => b.intensity - a.intensity);
 
-  // Layer konfigurieren mit proportionalen Größen
   layers = rawLayers.map((l, i) => {
-    // Radius basierend auf Intensität: je höher der Wert, desto größer die Schicht
-    const radiusMultiplier = 1 + (l.intensity * 2.5); // 1x bis 3.5x Vergrößerung
-    const targetRadius = l.baseRadius * radiusMultiplier;
-    
-    // Noise und Unregelmäßigkeit auch basierend auf Intensität
-    const noiseIntensity = 1.0 + (l.intensity * 3.0); // Mehr Chaos bei höheren Werten
-    
+    const radiusMultiplier = 1 + (l.intensity * 2.5);
+    const targetRadius = 200 * radiusMultiplier;
     return {
       label: l.label,
       color: l.color,
       intensity: l.intensity,
       baseRadius: targetRadius,
-      noiseMax: noiseIntensity,
+      noiseMax: 1.0 + (l.intensity * 3.0),
       rotateSpeed: 0.05 * (i % 2 === 0 ? 1 : -1),
       growth: 0,
       targetGrowth: targetRadius,
-      delay: i * 40 // Gestaffelte Animation
+      delay: i * 40
     };
   });
 
-  console.log("Created layers with intensities:", 
-    layers.map(l => `${l.label.split(':')[0]}: ${(l.intensity*100).toFixed(0)}% (${l.targetGrowth.toFixed(0)}px)`));
-  
   startFrame = frameCount;
 }
 
+// --- Main Loop ---
 function draw() {
   background("#000000");
   translate(centerX, centerY);
-  drawBlendedLayers(); // Schichten zeichnen
-  drawTooltip();       // Tooltip bei Hover anzeigen
+  drawBlendedLayers();
+  drawTooltip();
 }
 
 function drawBlendedLayers() {
-  let ctx = drawingContext;
-  ctx.shadowColor = "transparent";
-  ctx.shadowBlur = 0;
-
-  // Erste Schicht sofort starten (schneller)
   if (layers[0] && layers[0].growth < layers[0].targetGrowth) {
-    layers[0].growth += 4.0; // Schnelles Wachstum
+    layers[0].growth += 4.0;
   }
 
-  // Alle Schichten nacheinander wachsen lassen und ineinander überblenden
   for (let i = 0; i < layers.length - 1; i++) {
     let l1 = layers[i];
     let l2 = layers[i + 1];
-
     if (frameCount - startFrame > l2.delay) {
-      if (l2.growth < l2.targetGrowth) {
-        l2.growth += 3.0; // Schnelles Wachstum
-      }
+      if (l2.growth < l2.targetGrowth) l2.growth += 3.0;
     }
 
-    // Weniger Zwischenlayer für Performance, aber immer noch sanfte Übergänge
     for (let j = 0; j <= 8; j++) {
       let t = j / 8;
       let interpolatedLayer = {
@@ -297,7 +236,6 @@ function drawBlendedLayers() {
         color: lerpColor(l1.color, l2.color, t),
         intensity: lerp(l1.intensity, l2.intensity, t)
       };
-
       stroke(interpolatedLayer.color);
       fill(interpolatedLayer.color);
       strokeWeight(0.8);
@@ -306,27 +244,23 @@ function drawBlendedLayers() {
   }
 }
 
-// Schichtform (mit organischem Wackeln) zeichnen
 function drawInterpolatedLayer(layer) {
   beginShape();
-  for (let a = 0; a < 360; a += 2) { // Etwas höhere Auflösung für schönere Formen
+  for (let a = 0; a < 360; a += 2) {
     let xoff = map(sinVal[a], -1, 1, 0, layer.noiseMax);
     let yoff = map(cosVal[a], -1, 1, 0, layer.noiseMax);
     let n = pow(noise(xoff, yoff, frameCount * 0.005), 2);
-    
-    // Spitzen werden intensiver mit höherer Problemintensität
+
     let spikeIntensity = 1.0 + (layer.intensity * 2.0);
     let spikeFactor = sin(a * 3.7) * cos(a * 2.3) * sin(a * 5.1);
     spikeFactor = pow(abs(spikeFactor), 1.0) * spikeIntensity;
-    
-    // Noise-basierte Spitzen verstärkt durch Intensität
+
     let sharpNoise = noise(a * 0.1, frameCount * 0.01);
     sharpNoise = pow(sharpNoise, 1.8) * spikeIntensity;
-    
-    // Basis-Radius mit spitzer Modulation
+
     let baseRadius = map(n, 0, 1, layer.growth * 0.3, layer.growth * 1.1);
     let spikeRadius = baseRadius * (0.4 + 0.5 * spikeFactor + 0.3 * sharpNoise);
-    
+
     let x = spikeRadius * cos(a);
     let y = spikeRadius * sin(a);
     vertex(x, y);
@@ -334,7 +268,7 @@ function drawInterpolatedLayer(layer) {
   endShape(CLOSE);
 }
 
-// Tooltip beim Hovern über die Blume
+// --- Tooltip ---
 function drawTooltip() {
   let d = dist(mouseX, mouseY, centerX, centerY);
   if (d < 200) {
@@ -342,7 +276,9 @@ function drawTooltip() {
     fill(255, 230);
     stroke(0);
     strokeWeight(0.3);
-    rect(mouseX + 12, mouseY - 10, 240, 200, 6);
+
+    let tooltipHeight = 40 + layers.length * 18;
+    rect(mouseX + 12, mouseY - 10, 240, tooltipHeight, 6);
 
     fill(0);
     noStroke();
@@ -353,11 +289,10 @@ function drawTooltip() {
     text(currentCountry, mouseX + 20, mouseY + 10);
     textStyle(NORMAL);
 
-    // Farbliche Anzeige aller Kategorien von "schlecht" (oben) bis "gut" (unten)
     for (let i = 0; i < layers.length; i++) {
       let y = mouseY + 30 + i * 18;
       fill(layers[i].color);
-      ellipse(mouseX + 26, y - 4, 8, 8); // Farbpunkte
+      ellipse(mouseX + 26, y - 4, 8, 8);
       fill(0);
       noStroke();
       text(layers[i].label, mouseX + 40, y);
@@ -365,11 +300,8 @@ function drawTooltip() {
   }
 }
 
-// Canvas neu skalieren bei Fenstergrößenänderung
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
   centerX = width / 2;
   centerY = height / 2;
-  background("#000000");
-  draw();
 }

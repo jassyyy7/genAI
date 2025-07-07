@@ -1,58 +1,167 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Global Garden</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+  <meta charset="UTF-8" />
+  <title>Flower – Global Garden</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Verlinkung zur externen CSS-Datei -->
-    <link rel="stylesheet" href="style.css" />
+  <!-- Dein CSS -->
+  <link rel="stylesheet" href="style.css" />
 
-    <!-- p5.js Library für kreative Generative Gestaltung -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.2.0/p5.min.js"></script>
+  <!-- p5.js für Flower-Visual -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.2.0/p5.min.js"></script>
 
-    <!-- Neue Datenquellen von UN Data -->
-    <script src="air.js"></script>
-    <script src="biodiversity.js"></script>
-    <script src="co2.js"></script>
-    <script src="renewables.js"></script>
-    <script src="waste.js"></script>
-    <script src="water.js"></script>
+  <!-- Deine Datenquellen -->
+  <script src="air.js"></script>
+  <script src="biodiversity.js"></script>
+  <script src="co2.js"></script>
+  <script src="renewables.js"></script>
+  <script src="waste.js"></script>
+  <script src="water.js"></script>
 
-    <!-- Haupt-JavaScript für Flower-Logik -->
-    <script src="flower.js"></script>
-  </head>
-  <body>
+  <!-- Flower Logik -->
+  <script src="flower.js"></script>
 
-    <!-- ⬅️ Titelbereich oben links -->
-    <div class="title-box">
-      <h1>Global Garden</h1>
-      <p>
-        A digital world map where each country is represented by a unique flower.
-        The shape, color, and growth of each bloom are based on environmental factors
-        like CO₂ emissions, biodiversity, or renewable energy usage.
-      </p>
-    </div>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      color: #fff;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
 
-    <!-- ⬅️ Legende unten links -->
-    <div class="legend">
-      <h3>Environmental Indicators:</h3>
-      <ul>
-        <li><span style="background-color: #ff0000;"></span> Low CO₂</li>
-        <li><span style="background-color: #00c864;"></span> Renewables</li>
-        <li><span style="background-color: #0090ff;"></span> Low Water</li>
-        <li><span style="background-color: #ffee00;"></span> Clean Air</li>
-        <li><span style="background-color: #b000ff;"></span> Biodiversity</li>
-        <li><span style="background-color: #ffa500;"></span> Low Waste</li>
-        <li><span style="background-color: #ffffff;"></span> Transparency</li>
-      </ul>
-    </div>
+    .title-box {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0,0,0,0.8);
+      padding: 10px 20px;
+      border-radius: 6px;
+    }
 
-    <!-- ➕ Info-Button oben rechts -->
-    <a href="info.html" class="info-button">Info</a>
-    
-    <!-- ⬅️ Zurück-Button oben rechts -->
-    <a href="homescreen.html" class="back-button" style="position:fixed; top:60px; right:20px; background:#333; color:#fff; padding:10px 20px; text-decoration:none; border-radius:8px; font-size:14px; z-index:1000;">← Back to Map</a>
+    .title-box h1 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 1px;
+    }
 
-  </body>
+    .title-box p {
+      margin: 4px 0 0 0;
+      font-size: 14px;
+      color: #ccc;
+    }
+
+    /* Badge Styles */
+    .score-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 13px;
+      margin-left: 6px;
+    }
+    .score-badge.green {
+      background: #2ecc71; /* sattes Grün */
+      color: #000;
+    }
+    .score-badge.medium {
+      background: #f1c40f; /* Gelb */
+      color: #000;
+    }
+    .score-badge.low {
+      background: #e74c3c; /* Rot */
+      color: #fff;
+    }
+
+    .legend {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0,0,0,0.8);
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .legend h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+
+    .legend ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      text-align: left;
+    }
+
+    .legend li {
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+    }
+
+    .legend li span {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      margin-right: 8px;
+      border-radius: 50%;
+    }
+
+    .info-button, .back-button {
+      position: absolute;
+      top: 20px;
+      background: #111;
+      color: #fff;
+      padding: 8px 14px;
+      border: 1px solid #444;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 13px;
+      transition: background 0.3s ease;
+    }
+
+    .info-button:hover, .back-button:hover {
+      background: #333;
+    }
+
+    .info-button {
+      right: 20px;
+    }
+
+    .back-button {
+      right: 20px;
+      top: 60px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Ländername + Green Score mit Badge -->
+  <div class="title-box">
+    <h1 id="country-name">Country</h1>
+    <p>
+      Green Score: <span id="green-score" class="score-badge">--%</span>
+    </p>
+  </div>
+
+  <!-- Legende -->
+  <div class="legend">
+    <h3>Environmental Indicators</h3>
+    <ul>
+      <li><span style="background:#ff0000;"></span> Low CO₂</li>
+      <li><span style="background:#ffee00;"></span> Clean Air</li>
+      <li><span style="background:#0090ff;"></span> Low Water</li>
+      <li><span style="background:#ffa500;"></span> Low Waste</li>
+      <li><span style="background:#b000ff;"></span> Biodiversity</li>
+      <li><span style="background:#00c864;"></span> Renewables</li>
+      <li><span style="background:#ffffff;"></span> Transparency</li>
+    </ul>
+  </div>
+
+  <!-- Buttons -->
+  <a href="info.html" class="info-button">Info</a>
+  <a href="homescreen.html" class="back-button">← Back to Map</a>
+</body>
 </html>
