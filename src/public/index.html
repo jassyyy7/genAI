@@ -69,22 +69,36 @@
   const audio = document.getElementById("global-audio");
   const button = document.getElementById("audio-toggle-btn");
 
+  // Audio-Status aus localStorage lesen
   const resume = localStorage.getItem("audioPlaying") === "true";
   const time = parseFloat(localStorage.getItem("audioTime") || 0);
+  const volume = parseFloat(localStorage.getItem("audioVolume") || 1);
 
-  if (resume) {
-    audio.currentTime = time;
-    audio.play().then(() => {
-      button.textContent = "⏸ Pause Audio";
-    }).catch(err => {
-      console.warn("Autoplay blocked");
-    });
+  // Volume setzen
+  audio.volume = volume;
+
+  // Sanftere Audio-Fortsetzung ohne störende Unterbrechung
+  if (resume && time > 0) {
+    // Kleine Verzögerung, um sicherzustellen, dass die Seite vollständig geladen ist
+    setTimeout(() => {
+      audio.currentTime = time;
+      audio.play().then(() => {
+        button.textContent = "⏸ Pause Audio";
+      }).catch(err => {
+        console.warn("Autoplay blocked - User muss Play drücken");
+        // Falls Autoplay blockiert, Button-Text anpassen
+        button.textContent = "▶ Resume Audio";
+      });
+    }, 100);
   }
 
   button.addEventListener("click", () => {
     if (audio.paused) {
-      audio.play();
-      button.textContent = "⏸ Pause Audio";
+      audio.play().then(() => {
+        button.textContent = "⏸ Pause Audio";
+      }).catch(err => {
+        console.warn("Audio play failed");
+      });
     } else {
       audio.pause();
       button.textContent = "▶ Hear the Global Garden";
@@ -93,6 +107,27 @@
 
   audio.addEventListener("ended", () => {
     button.textContent = "▶ Hear the Global Garden";
+    localStorage.setItem("audioPlaying", "false");
+  });
+
+  // Audio-Status kontinuierlich speichern für nahtlose Navigation
+  setInterval(() => {
+    if (!audio.paused) {
+      localStorage.setItem("audioPlaying", "true");
+      localStorage.setItem("audioTime", audio.currentTime);
+      localStorage.setItem("audioVolume", audio.volume);
+    } else {
+      localStorage.setItem("audioPlaying", "false");
+    }
+  }, 250);
+
+  // Vor der Navigation Audio-Zustand speichern
+  window.addEventListener("beforeunload", () => {
+    if (!audio.paused) {
+      localStorage.setItem("audioPlaying", "true");
+      localStorage.setItem("audioTime", audio.currentTime);
+      localStorage.setItem("audioVolume", audio.volume);
+    }
   });
 </script>
 

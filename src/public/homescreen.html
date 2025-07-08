@@ -413,19 +413,38 @@
     if (!audio.paused) {
       localStorage.setItem("audioPlaying", "true");
       localStorage.setItem("audioTime", audio.currentTime);
+      localStorage.setItem("audioVolume", audio.volume);
     } else {
       localStorage.setItem("audioPlaying", "false");
     }
-  }, 500);
+  }, 250); // Häufigere Updates für bessere Synchronisation
 
   // Falls Audio im LocalStorage als "spielend" markiert ist → fortsetzen
   window.addEventListener("load", () => {
     const playing = localStorage.getItem("audioPlaying");
     const time = localStorage.getItem("audioTime");
+    const volume = localStorage.getItem("audioVolume");
+    
+    if (volume) {
+      audio.volume = parseFloat(volume);
+    }
+    
     if (playing === "true" && time) {
       audio.currentTime = parseFloat(time);
-      audio.play();
-      button.textContent = "⏸ Pause Audio";
+      audio.play().then(() => {
+        button.textContent = "⏸ Pause Audio";
+      }).catch(err => {
+        console.warn("Autoplay blocked");
+      });
+    }
+  });
+
+  // Vor der Navigation Audio-Zustand speichern
+  window.addEventListener("beforeunload", () => {
+    if (!audio.paused) {
+      localStorage.setItem("audioPlaying", "true");
+      localStorage.setItem("audioTime", audio.currentTime);
+      localStorage.setItem("audioVolume", audio.volume);
     }
   });
 </script>
