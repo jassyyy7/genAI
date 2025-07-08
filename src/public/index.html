@@ -34,6 +34,16 @@
       </p>
     </div>
 
+    <!-- 🔁 Wiedergabe-Fortsetzung -->
+    <div style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 30;">
+      <button id="audio-toggle-btn"
+        style="background: #fff; color: #000; border: none; padding: 8px 16px; font-size: 16px; border-radius: 6px;">
+        ▶ Hear the Global Garden
+      </button>
+      <audio id="global-audio" src="audio_the_Global_Garden.mp3"></audio>
+    </div>
+
+
     <!-- ⬅️ Legende unten links -->
     <div class="legend">
       <h3>Environmental Indicators:</h3>
@@ -53,6 +63,38 @@
     
     <!-- ⬅️ Zurück-Button oben rechts -->
     <a href="homescreen.html" class="back-button" style="position:fixed; top:60px; right:20px; background:#333; color:#fff; padding:10px 20px; text-decoration:none; border-radius:8px; font-size:14px; z-index:1000;">← Back to Map</a>
+
+
+  <script>
+  const audio = document.getElementById("global-audio");
+  const button = document.getElementById("audio-toggle-btn");
+
+  const resume = localStorage.getItem("audioPlaying") === "true";
+  const time = parseFloat(localStorage.getItem("audioTime") || 0);
+
+  if (resume) {
+    audio.currentTime = time;
+    audio.play().then(() => {
+      button.textContent = "⏸ Pause Audio";
+    }).catch(err => {
+      console.warn("Autoplay blocked");
+    });
+  }
+
+  button.addEventListener("click", () => {
+    if (audio.paused) {
+      audio.play();
+      button.textContent = "⏸ Pause Audio";
+    } else {
+      audio.pause();
+      button.textContent = "▶ Hear the Global Garden";
+    }
+  });
+
+  audio.addEventListener("ended", () => {
+    button.textContent = "▶ Hear the Global Garden";
+  });
+</script>
 
   </body>
 </html>

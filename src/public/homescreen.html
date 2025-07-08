@@ -78,6 +78,17 @@
       </p>
     </div>
 
+    <!-- Audio-Erklärung Global Garden -->
+    <div style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 30;">
+      <button id="audio-toggle-btn"
+        style="background: #fff; color: #000; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">
+        ▶ Hear the Global Garden
+      </button>
+      <audio id="global-audio" src="audio_the_Global_Garden.mp3"></audio>
+    </div>
+
+
+
     <!-- ⬅️ Legende unten links -->
     <div class="legend">
       <h3>Environmental Indicators:</h3>
@@ -377,5 +388,48 @@
       });
     </script>
   </div>
+<script>
+  const audio = document.getElementById("global-audio");
+  const button = document.getElementById("audio-toggle-btn");
+
+  // Beim Klick abspielen/pausieren
+  button.addEventListener("click", () => {
+    if (audio.paused) {
+      audio.play();
+      button.textContent = "⏸ Pause Audio";
+    } else {
+      audio.pause();
+      button.textContent = "▶ Hear the Global Garden";
+    }
+  });
+
+  // Wenn fertig, Text zurücksetzen
+  audio.addEventListener("ended", () => {
+    button.textContent = "▶ Hear the Global Garden";
+  });
+
+  // Audio-Status regelmäßig speichern
+  setInterval(() => {
+    if (!audio.paused) {
+      localStorage.setItem("audioPlaying", "true");
+      localStorage.setItem("audioTime", audio.currentTime);
+    } else {
+      localStorage.setItem("audioPlaying", "false");
+    }
+  }, 500);
+
+  // Falls Audio im LocalStorage als "spielend" markiert ist → fortsetzen
+  window.addEventListener("load", () => {
+    const playing = localStorage.getItem("audioPlaying");
+    const time = localStorage.getItem("audioTime");
+    if (playing === "true" && time) {
+      audio.currentTime = parseFloat(time);
+      audio.play();
+      button.textContent = "⏸ Pause Audio";
+    }
+  });
+</script>
+
+
 </body>
 </html> 
