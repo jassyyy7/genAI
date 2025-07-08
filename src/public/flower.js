@@ -83,6 +83,11 @@ function combineCountryData() {
   const safeWasteData = typeof wasteData !== 'undefined' ? wasteData : {};
   const safeWaterData = typeof waterData !== 'undefined' ? waterData : {};
 
+  // Debug: Datenstrukturen prüfen
+  console.log("Data structures:");
+  console.log("Air data sample:", Object.keys(safeAirData).slice(0,3).map(k => k + ': ' + JSON.stringify(safeAirData[k])));
+  console.log("Renewables data sample:", Object.keys(safeRenewablesData).slice(0,3).map(k => k + ': ' + JSON.stringify(safeRenewablesData[k])));
+
   // Alle verfügbaren Länder sammeln
   const allCountries = new Set([
     ...Object.keys(safeAirData),
@@ -94,6 +99,7 @@ function combineCountryData() {
   ]);
 
   console.log("Found countries:", allCountries.size);
+  console.log("Sample countries:", Array.from(allCountries).slice(0, 5));
 
   // Für jedes Land die Daten kombinieren
   allCountries.forEach(country => {
@@ -101,12 +107,24 @@ function combineCountryData() {
       co2: safeCountryData[country]?.co2 || 5.0,
       air: safeAirData[country]?.air || 15.0,
       biodiversity: safeBiodiversityData[country]?.kba_pct || 50.0,
-      renewables: safeRenewablesData[country] || 20.0,
+      renewables: safeRenewablesData[country] || 20.0, // renewables hat bereits direkte Werte
       waste: safeWasteData[country]?.plasticWaste || 1.0,
       water: safeWaterData[country]?.water || 100.0,
       transparency: 50
     };
+    
+    // Debug: Erste paar Länder ausgeben
+    if (Array.from(allCountries).indexOf(country) < 3) {
+      console.log(`Data for ${country}:`, combinedData[country]);
+    }
   });
+  
+  // Spezielle Debug-Info für United Kingdom
+  if (combinedData['United Kingdom']) {
+    console.log("United Kingdom data found:", combinedData['United Kingdom']);
+  } else {
+    console.warn("United Kingdom data NOT found in combinedData!");
+  }
   
   console.log("Combined data for", Object.keys(combinedData).length, "countries");
 }
@@ -143,25 +161,77 @@ function initFlowerLayers(englishCountryName, displayName) {
   currentCountry = englishCountryName; // Immer englischer Name
   console.log("Initializing flower for:", englishCountryName);
   
+  let hasData = true;
+  let data;
+  
   // Prüfen ob Daten für das Land vorhanden sind
   if (!combinedData[englishCountryName]) {
-    console.warn(`No data for ${englishCountryName}, using Germany as fallback`);
-    englishCountryName = 'Germany';
-    currentCountry = 'Germany';
+    console.warn(`No data for ${englishCountryName} - showing neutral gray flower`);
+    hasData = false;
+    currentCountry = englishCountryName + " (No Data Available)";
+    
+    // Neutrale Dummy-Daten für gräuliche Blume
+    data = {
+      co2: 0,
+      air: 0,
+      biodiversity: 0,
+      renewables: 0,
+      waste: 0,
+      water: 0,
+      transparency: 0
+    };
+  } else {
+    data = combinedData[englishCountryName];
   }
-  
-  // Falls auch Deutschland nicht existiert, verwende Dummy-Daten
-  const data = combinedData[englishCountryName] || {
-    co2: 7.0,
-    air: 12.0,
-    biodiversity: 65.0,
-    renewables: 25.0,
-    waste: 2.0,
-    water: 400.0,
-    transparency: 50
-  };
 
   console.log("Using data for", englishCountryName, ":", data);
+
+  // Wenn keine Daten vorhanden, erstelle gräuliche Blume
+  if (!hasData) {
+    // Einfache gräuliche Schichten für "Keine Daten"
+    let rawLayers = [
+      {
+        label: `No environmental data available`,
+        value: 0.3,
+        intensity: 0.3,
+        color: color(120, 120, 120, 80), // Grau
+        baseRadius: 180
+      },
+      {
+        label: `Please check back later`,
+        value: 0.2,
+        intensity: 0.2,
+        color: color(100, 100, 100, 60), // Dunkleres Grau
+        baseRadius: 200
+      },
+      {
+        label: `Data not available`,
+        value: 0.1,
+        intensity: 0.1,
+        color: color(80, 80, 80, 40), // Noch dunkleres Grau
+        baseRadius: 220
+      }
+    ];
+
+    // Layer konfigurieren
+    layers = rawLayers.map((l, i) => {
+      return {
+        label: l.label,
+        color: l.color,
+        intensity: l.intensity,
+        baseRadius: l.baseRadius,
+        noiseMax: 0.5, // Wenig Chaos für ruhige Darstellung
+        rotateSpeed: 0.01 * (i % 2 === 0 ? 1 : -1), // Langsame Rotation
+        growth: 0,
+        targetGrowth: l.baseRadius,
+        delay: i * 60 // Langsamere gestaffelte Animation
+      };
+    });
+
+    console.log("Created neutral gray flower for missing data");
+    startFrame = frameCount;
+    return;
+  }
 
   // Normalisierte Werte berechnen (0-1 Skala, wobei höhere Werte = größere Probleme)
   const normalizedValues = {
