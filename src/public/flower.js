@@ -102,8 +102,6 @@ function combineCountryData() {
 
 // --- p5.js ---
 function setup() {
-  console.log("🌸 Setting up flower visualization...");
-
   combineCountryData();
   createCanvas(windowWidth, windowHeight);
   angleMode(DEGREES);
@@ -125,34 +123,31 @@ function initFlowerLayers(englishCountryName) {
   currentCountry = englishCountryName;
 
   if (!combinedData[englishCountryName]) {
-    console.warn(`No data for ${englishCountryName}, fallback to Germany`);
     englishCountryName = 'Germany';
     currentCountry = 'Germany';
   }
 
-  const data = combinedData[englishCountryName] || {
-    co2: 7.0, air: 12.0, biodiversity: 65.0, renewables: 25.0, waste: 2.0, water: 400.0, transparency: 50
-  };
+  const data = combinedData[englishCountryName];
 
   // --- Green Score ---
   const normalizedValues = {
-    co2: 1 - Math.min(data.co2 / 15, 1),
-    air: Math.min(data.air / 30, 1),
-    water: 1 - Math.min(data.water / 1000, 1),
-    waste: 1 - Math.min(data.waste / 25, 1),
-    biodiversity: Math.min(data.biodiversity / 100, 1),
-    renewables: Math.min(data.renewables / 100, 1),
-    transparency: Math.min(data.transparency / 100, 1)
+    co2: Math.min(data.co2 / 15, 1),                  // hoch = schlecht
+    air: 1 - Math.min(data.air / 30, 1),              // hoch = gut
+    water: Math.min(data.water / 1000, 1),            // hoch = schlecht
+    waste: Math.min(data.waste / 25, 1),              // hoch = schlecht
+    biodiversity: 1 - Math.min(data.biodiversity / 100, 1), // hoch = gut
+    renewables: 1 - Math.min(data.renewables / 100, 1),     // hoch = gut
+    transparency: 1 - Math.min(data.transparency / 100, 1)  // hoch = gut
   };
 
-  const greenScore = (
+  const greenScore = 1 - (
     normalizedValues.co2 +
-    normalizedValues.air +
     normalizedValues.water +
     normalizedValues.waste +
     normalizedValues.biodiversity +
     normalizedValues.renewables +
-    normalizedValues.transparency
+    normalizedValues.transparency +
+    normalizedValues.air
   ) / 7;
 
   const greenScorePercent = (greenScore * 100).toFixed(1);
@@ -178,13 +173,13 @@ function initFlowerLayers(englishCountryName) {
 
   // --- Layers ---
   let rawLayers = [
-    { label: `Low CO₂: ${data.co2}t`, intensity: 1 - normalizedValues.co2, color: color(255, 0, 0, 120) },
-    { label: `Clean Air: ${data.air}`, intensity: 1 - normalizedValues.air, color: color(255, 255, 0, 120) },
-    { label: `Low Water: ${data.water} L`, intensity: 1 - normalizedValues.water, color: color(0, 150, 255, 120) },
-    { label: `Low Waste: ${data.waste} kg`, intensity: 1 - normalizedValues.waste, color: color(255, 165, 0, 120) },
-    { label: `Biodiversity: ${data.biodiversity.toFixed(1)}%`, intensity: 1 - normalizedValues.biodiversity, color: color(180, 0, 255, 120) },
-    { label: `Renewables: ${data.renewables.toFixed(1)}%`, intensity: 1 - normalizedValues.renewables, color: color(0, 200, 100, 120) },
-    { label: `Transparency: ${data.transparency}`, intensity: 1 - normalizedValues.transparency, color: color(255, 255, 255, 80) }
+    { label: `CO₂: ${data.co2}t`, intensity: normalizedValues.co2, color: color(255, 0, 0, 120) },
+    { label: `Air: ${data.air}`, intensity: 1 - normalizedValues.air, color: color(255, 255, 0, 120) },
+    { label: `Water: ${data.water} L`, intensity: normalizedValues.water, color: color(0, 150, 255, 120) },
+    { label: `Waste: ${data.waste} kg`, intensity: normalizedValues.waste, color: color(255, 165, 0, 120) },
+    { label: `Biodiversity: ${data.biodiversity.toFixed(1)}%`, intensity: normalizedValues.biodiversity, color: color(180, 0, 255, 120) },
+    { label: `Renewables: ${data.renewables.toFixed(1)}%`, intensity: normalizedValues.renewables, color: color(0, 200, 100, 120) },
+    { label: `Transparency: ${data.transparency}`, intensity: normalizedValues.transparency, color: color(255, 255, 255, 80) }
   ];
 
   rawLayers.sort((a, b) => b.intensity - a.intensity);
@@ -268,7 +263,6 @@ function drawInterpolatedLayer(layer) {
   endShape(CLOSE);
 }
 
-// --- Tooltip ---
 function drawTooltip() {
   let d = dist(mouseX, mouseY, centerX, centerY);
   if (d < 200) {
