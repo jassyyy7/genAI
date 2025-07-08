@@ -131,24 +131,28 @@ function initFlowerLayers(englishCountryName) {
 
   // --- Green Score ---
   const normalizedValues = {
-    co2: Math.min(data.co2 / 15, 1),                  // hoch = schlecht
-    air: 1 - Math.min(data.air / 30, 1),              // hoch = gut
-    water: Math.min(data.water / 1000, 1),            // hoch = schlecht
-    waste: Math.min(data.waste / 25, 1),              // hoch = schlecht
+    co2: Math.min(data.co2 / 12, 1),                    // hoch = schlecht (angepasster Grenzwert)
+    air: Math.min(data.air / 30, 1),                    // KORRIGIERT: hoch = schlecht für PM2.5
+    water: Math.min(data.water / 800, 1),               // angepasster Grenzwert für Europa
+    waste: Math.min(data.waste / 20, 1),                // hoch = schlecht (angepasst)
     biodiversity: 1 - Math.min(data.biodiversity / 100, 1), // hoch = gut
     renewables: 1 - Math.min(data.renewables / 100, 1),     // hoch = gut
     transparency: 1 - Math.min(data.transparency / 100, 1)  // hoch = gut
   };
 
+  // Gewichtete Berechnung mit weniger Gewicht auf Wasserverbrauch für wasserreiche Länder
+  const isWaterRich = ["Norway", "Finland", "Sweden", "Iceland"].includes(englishCountryName);
+  const waterWeight = isWaterRich ? 0.5 : 1.0; // Reduzierte Gewichtung für wasserreiche Länder
+  
   const greenScore = 1 - (
     normalizedValues.co2 +
-    normalizedValues.water +
+    normalizedValues.air +                               // KORRIGIERT: nicht mehr invertiert
+    (normalizedValues.water * waterWeight) +
     normalizedValues.waste +
     normalizedValues.biodiversity +
     normalizedValues.renewables +
-    normalizedValues.transparency +
-    normalizedValues.air
-  ) / 7;
+    normalizedValues.transparency
+  ) / (6 + waterWeight); // Angepasster Divisor
 
   const greenScorePercent = (greenScore * 100).toFixed(1);
 
@@ -174,7 +178,7 @@ function initFlowerLayers(englishCountryName) {
   // --- Layers ---
   let rawLayers = [
     { label: `CO₂: ${data.co2}t`, intensity: normalizedValues.co2, color: color(255, 0, 0, 120) },
-    { label: `Air: ${data.air}`, intensity: 1 - normalizedValues.air, color: color(255, 255, 0, 120) },
+    { label: `Air: ${data.air}`, intensity: normalizedValues.air, color: color(255, 255, 0, 120) }, // KORRIGIERT
     { label: `Water: ${data.water} L`, intensity: normalizedValues.water, color: color(0, 150, 255, 120) },
     { label: `Waste: ${data.waste} kg`, intensity: normalizedValues.waste, color: color(255, 165, 0, 120) },
     { label: `Biodiversity: ${data.biodiversity.toFixed(1)}%`, intensity: normalizedValues.biodiversity, color: color(180, 0, 255, 120) },
