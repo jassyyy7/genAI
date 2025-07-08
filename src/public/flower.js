@@ -60,6 +60,10 @@ const countryMapping = {
   "Vatikan": "Vatican"
 };
 
+const urlCountryCodeMapping = {
+  "GB-GBN": "United Kingdom",
+};
+
 // URL-Parameter auslesen
 function getURLParameter(name) {
   const urlParams = new URLSearchParams(window.location.search);
@@ -110,7 +114,7 @@ function combineCountryData() {
       renewables: safeRenewablesData[country] || 20.0, // renewables hat bereits direkte Werte
       waste: safeWasteData[country]?.plasticWaste || 1.0,
       water: safeWaterData[country]?.water || 100.0,
-      transparency: 50
+      //transparency: 50
     };
     
     // Debug: Erste paar Länder ausgeben
@@ -151,7 +155,11 @@ function setup() {
   }
 
   // Land aus URL-Parameter lesen (bereits auf Englisch)
-  const selectedCountry = getURLParameter('country') || 'Germany';
+  //const selectedCountry = getURLParameter('country') || 'Germany'; ++++++++++ HIIIIIIEEEERRR
+  const urlParam = getURLParameter('country');
+  const mappedFromUrl = urlCountryCodeMapping[urlParam];         // z. B. "GB-GBN" → "United Kingdom"
+  const mappedFromGerman = getEnglishCountryName(urlParam);      // z. B. "Deutschland" → "Germany"
+  const selectedCountry = mappedFromUrl || mappedFromGerman || 'Germany';
   console.log("Selected country:", selectedCountry);
   
   initFlowerLayers(selectedCountry);
@@ -178,7 +186,7 @@ function initFlowerLayers(englishCountryName, displayName) {
       renewables: 0,
       waste: 0,
       water: 0,
-      transparency: 0
+      //transparency: 0
     };
   } else {
     data = combinedData[englishCountryName];
@@ -241,7 +249,7 @@ function initFlowerLayers(englishCountryName, displayName) {
     waste: Math.min(data.waste / 25, 1),          // 0-25kg Abfall -> 0-1
     biodiversityLoss: Math.min((100 - data.biodiversity) / 80, 1), // Biodiversitätsverlust
     renewablesLack: Math.min((100 - data.renewables) / 80, 1),     // Mangel an Erneuerbaren
-    transparency: Math.min((100 - data.transparency) / 100, 1)     // Mangel an Transparenz
+    //transparency: Math.min((100 - data.transparency) / 100, 1)     // Mangel an Transparenz
   };
 
   console.log("Normalized values:", normalizedValues);
@@ -290,13 +298,13 @@ function initFlowerLayers(englishCountryName, displayName) {
       color: color(0, 200, 100, 120), // Grün (invertiert)
       baseRadius: 200
     },
-    {
-      label: `Transparency: ${data.transparency}`,
-      value: normalizedValues.transparency,
-      intensity: normalizedValues.transparency,
-      color: color(255, 255, 255, 80), // Weiß, transparenter
-      baseRadius: 200
-    }
+    //{
+    //  label: `Transparency: ${data.transparency}`,
+    //  value: normalizedValues.transparency,
+    //  intensity: normalizedValues.transparency,
+    //  color: color(255, 255, 255, 80), // Weiß, transparenter
+    //  baseRadius: 200
+    //}
   ];
 
   // Sortierung: stärkste Probleme (höchste Intensität) zuerst = äußerste Schicht
