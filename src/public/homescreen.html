@@ -39,9 +39,11 @@
       z-index: 10;
     }
     /* Titelbox und Legende bleiben sichtbar */
-    .title-box, .legend, .info-button {
+    .title-box, .legend {
       z-index: 20;
     }
+    
+
     .center-box {
       text-align: center;
       background: rgba(0,0,0,0.95);
@@ -64,6 +66,26 @@
     }
     .flower-btn:hover {
       background: #0070c0;
+    }
+    
+    /* Info Button als Link Element */
+    .info-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #111;
+      color: #fff;
+      padding: 8px 16px;
+      border: 1px solid #444;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
+      transition: background 0.3s ease, color 0.3s ease;
+      z-index: 20;
+    }
+    
+    .info-button:hover {
+      background: #333;
     }
   </style>
 </head>
@@ -92,7 +114,7 @@
 
 
     <!-- ➕ Info-Button oben rechts -->
-    <a href="/" class="info-button">Info</a>
+    <a href="/#fphren" class="info-button">Info</a>
 
   <div class="center-box">
 
@@ -376,6 +398,9 @@
       });
     </script>
   </div>
+  
+
+
 <script>
   const audio = document.getElementById("global-audio");
   const button = document.getElementById("audio-toggle-btn");
@@ -435,6 +460,8 @@
       localStorage.setItem("audioVolume", audio.volume);
     }
   });
+
+
 </script>
 
 
