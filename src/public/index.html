@@ -24,13 +24,16 @@
   </head>
   <body>
 
-    <!-- ⬅️ Titelbereich oben links -->
-    <div class="title-box">
-      <h1>Global Garden</h1>
-      <p>
-        A digital world map where each country is represented by a unique flower.
-        The shape, color, and growth of each bloom are based on environmental factors
-        like CO₂ emissions, biodiversity, or renewable energy usage.
+    <!-- ⬅️ Green Score Anzeige oben links -->
+    <div class="green-score-box">
+      <h1 id="country-name">Deutschland</h1>
+      <div class="score-container">
+        <div class="score-label">Green Score</div>
+        <div id="green-score" class="green-score-badge medium">---%</div>
+      </div>
+      <p class="score-description">
+        Environmental performance based on CO₂ emissions, air quality, water consumption, 
+        waste management, biodiversity and renewable energy.
       </p>
     </div>
 
@@ -47,6 +50,7 @@
     <!-- ⬅️ Legende unten links -->
     <div class="legend">
       <h3>Environmental Indicators:</h3>
+      <p class="legend-subtitle">Better values create larger flower layers</p>
       <ul>
         <li><span style="background-color: #ff0000;"></span> Low CO₂</li>
         <li><span style="background-color: #00c864;"></span> Renewables</li>
@@ -54,7 +58,6 @@
         <li><span style="background-color: #ffee00;"></span> Clean Air</li>
         <li><span style="background-color: #b000ff;"></span> Biodiversity</li>
         <li><span style="background-color: #ffa500;"></span> Low Waste</li>
-         <!-- <li><span style="background-color: #ffffff;"></span> Transparency</li>  -->
       </ul>
     </div>
 

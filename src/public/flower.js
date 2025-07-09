@@ -196,146 +196,207 @@ function initFlowerLayers(englishCountryName, displayName) {
 
   // Wenn keine Daten vorhanden, erstelle gräuliche Blume
   if (!hasData) {
-    // Einfache gräuliche Schichten für "Keine Daten"
+    // Simple gray layers for "No Data"
     let rawLayers = [
       {
         label: `No environmental data available`,
-        value: 0.3,
-        intensity: 0.3,
-        color: color(120, 120, 120, 80), // Grau
-        baseRadius: 180
+        value: 0.2,
+        intensity: 0.2,
+        color: color(120, 120, 120, 80), // Gray
+        baseRadius: 120
+      },
+      {
+        label: `Data being collected`,
+        value: 0.15,
+        intensity: 0.15,
+        color: color(100, 100, 100, 60), // Darker gray
+        baseRadius: 140
       },
       {
         label: `Please check back later`,
-        value: 0.2,
-        intensity: 0.2,
-        color: color(100, 100, 100, 60), // Dunkleres Grau
-        baseRadius: 200
-      },
-      {
-        label: `Data not available`,
         value: 0.1,
         intensity: 0.1,
-        color: color(80, 80, 80, 40), // Noch dunkleres Grau
-        baseRadius: 220
+        color: color(80, 80, 80, 40), // Even darker gray
+        baseRadius: 160
       }
     ];
 
-    // Layer konfigurieren
+    // Configure layers
     layers = rawLayers.map((l, i) => {
       return {
         label: l.label,
         color: l.color,
         intensity: l.intensity,
         baseRadius: l.baseRadius,
-        noiseMax: 0.5, // Wenig Chaos für ruhige Darstellung
-        rotateSpeed: 0.01 * (i % 2 === 0 ? 1 : -1), // Langsame Rotation
+        noiseMax: 0.4, // Little chaos for calm display
+        rotateSpeed: 0.01 * (i % 2 === 0 ? 1 : -1), // Slow rotation
         growth: 0,
         targetGrowth: l.baseRadius,
-        delay: i * 60 // Langsamere gestaffelte Animation
+        delay: i * 50 // Slower staggered animation
       };
     });
 
     console.log("Created neutral gray flower for missing data");
+    
+    // Show "No Data" for Green Score when no environmental data available
+    displayNoDataGreenScore(englishCountryName);
+    
     startFrame = frameCount;
     return;
   }
 
-  // Normalisierte Werte berechnen (0-1 Skala, wobei höhere Werte = größere Probleme)
-  const normalizedValues = {
-    co2: Math.min(data.co2 / 15, 1),              // 0-15t CO2 -> 0-1
-    air: Math.min(data.air / 30, 1),              // 0-30 Luftqualität -> 0-1  
-    water: Math.min(data.water / 1000, 1),        // 0-1000L Wasser -> 0-1
-    waste: Math.min(data.waste / 25, 1),          // 0-25kg Abfall -> 0-1
-    biodiversityLoss: Math.min((100 - data.biodiversity) / 80, 1), // Biodiversitätsverlust
-    renewablesLack: Math.min((100 - data.renewables) / 80, 1),     // Mangel an Erneuerbaren
-    //transparency: Math.min((100 - data.transparency) / 100, 1)     // Mangel an Transparenz
+  // Calculate positive values (0-1 scale, where higher values = better environmental performance)
+  const positiveValues = {
+    lowCO2: 1 - Math.min(data.co2 / 15, 1),           // Low CO2 = good
+    cleanAir: 1 - Math.min(data.air / 30, 1),         // Low air pollution = good  
+    waterEfficiency: 1 - Math.min(data.water / 1000, 1), // Low water consumption = good
+    lowWaste: 1 - Math.min(data.waste / 25, 1),       // Low waste = good
+    biodiversity: Math.min(data.biodiversity / 100, 1), // High biodiversity = good
+    renewables: Math.min(data.renewables / 100, 1),   // High renewable energy = good
+    //transparency: Math.min((data.transparency || 50) / 100, 1) // High transparency = good
   };
 
-  console.log("Normalized values:", normalizedValues);
+  console.log("Positive environmental values:", positiveValues);
 
-  // Umweltkategorien mit proportionalen Größen basierend auf Werten
+  // Environmental categories - better values lead to larger, more prominent layers
   let rawLayers = [
     {
       label: `Low CO₂: ${data.co2}t`,
-      value: normalizedValues.co2,
-      intensity: normalizedValues.co2, // Wie stark diese Kategorie ausgeprägt ist
-      color: color(255, 0, 0, 120), // Rot
-      baseRadius: 200 // Minimaler Radius
+      value: positiveValues.lowCO2,
+      intensity: positiveValues.lowCO2,
+      color: color(255, 0, 0, 120), // Red
+      baseRadius: 180
     },
     {
       label: `Clean Air: ${data.air}`,
-      value: normalizedValues.air,
-      intensity: normalizedValues.air,
-      color: color(255, 255, 0, 120), // Gelb
-      baseRadius: 200
+      value: positiveValues.cleanAir,
+      intensity: positiveValues.cleanAir,
+      color: color(255, 255, 0, 120), // Yellow
+      baseRadius: 180
     },
     {
       label: `Low Water: ${data.water} L`,
-      value: normalizedValues.water,
-      intensity: normalizedValues.water,
-      color: color(0, 150, 255, 120), // Blau
-      baseRadius: 200
+      value: positiveValues.waterEfficiency,
+      intensity: positiveValues.waterEfficiency,
+      color: color(0, 150, 255, 120), // Blue
+      baseRadius: 180
     },
     {
       label: `Low Waste: ${data.waste} kg`,
-      value: normalizedValues.waste,
-      intensity: normalizedValues.waste,
+      value: positiveValues.lowWaste,
+      intensity: positiveValues.lowWaste,
       color: color(255, 165, 0, 120), // Orange
-      baseRadius: 200
+      baseRadius: 180
     },
     {
       label: `Biodiversity: ${data.biodiversity.toFixed(1)}%`,
-      value: normalizedValues.biodiversityLoss,
-      intensity: normalizedValues.biodiversityLoss,
-      color: color(180, 0, 255, 120), // Lila
-      baseRadius: 200
+      value: positiveValues.biodiversity,
+      intensity: positiveValues.biodiversity,
+      color: color(180, 0, 255, 120), // Purple
+      baseRadius: 180
     },
     {
       label: `Renewables: ${data.renewables.toFixed(1)}%`,
-      value: normalizedValues.renewablesLack,
-      intensity: normalizedValues.renewablesLack,
-      color: color(0, 200, 100, 120), // Grün (invertiert)
-      baseRadius: 200
-    },
-    //{
-    //  label: `Transparency: ${data.transparency}`,
-    //  value: normalizedValues.transparency,
-    //  intensity: normalizedValues.transparency,
-    //  color: color(255, 255, 255, 80), // Weiß, transparenter
-    //  baseRadius: 200
-    //}
+      value: positiveValues.renewables,
+      intensity: positiveValues.renewables,
+      color: color(0, 200, 100, 120), // Green
+      baseRadius: 180
+    }
   ];
 
-  // Sortierung: stärkste Probleme (höchste Intensität) zuerst = äußerste Schicht
+  // Sorting: best values (highest intensity) first = outermost layer
   rawLayers.sort((a, b) => b.intensity - a.intensity);
 
-  // Layer konfigurieren mit proportionalen Größen
+  // Configure layers with proportional sizes
   layers = rawLayers.map((l, i) => {
-    // Radius basierend auf Intensität: je höher der Wert, desto größer die Schicht
-    const radiusMultiplier = 1 + (l.intensity * 2.5); // 1x bis 3.5x Vergrößerung
+    // Radius based on positive intensity: better value = larger layer
+    const radiusMultiplier = 0.5 + (l.intensity * 2.5); // 0.5x to 3x enlargement
     const targetRadius = l.baseRadius * radiusMultiplier;
     
-    // Noise und Unregelmäßigkeit auch basierend auf Intensität
-    const noiseIntensity = 1.0 + (l.intensity * 3.0); // Mehr Chaos bei höheren Werten
+    // Smoother forms for better values (less chaotic)
+    const smoothnessIntensity = 0.3 + (l.intensity * 0.7); // Smoother forms for better values
     
     return {
       label: l.label,
       color: l.color,
       intensity: l.intensity,
       baseRadius: targetRadius,
-      noiseMax: noiseIntensity,
-      rotateSpeed: 0.05 * (i % 2 === 0 ? 1 : -1),
+      noiseMax: smoothnessIntensity, // Less chaos = prettier forms
+      rotateSpeed: 0.03 * (i % 2 === 0 ? 1 : -1), // Slower, more elegant rotation
       growth: 0,
       targetGrowth: targetRadius,
-      delay: i * 40 // Gestaffelte Animation
+      delay: i * 30 // Faster animation for better visibility
     };
   });
 
-  console.log("Created layers with intensities:", 
-    layers.map(l => `${l.label.split(':')[0]}: ${(l.intensity*100).toFixed(0)}% (${l.targetGrowth.toFixed(0)}px)`));
+  console.log("Created layers with positive values:", 
+    layers.map(l => `${l.label.split(':')[0]}: ${(l.intensity*100).toFixed(0)}% good (${l.targetGrowth.toFixed(0)}px radius)`));
+  
+  // --- Calculate and display Green Score ---
+  calculateAndDisplayGreenScore(englishCountryName, data);
   
   startFrame = frameCount;
+}
+
+// Green Score calculation and display
+function calculateAndDisplayGreenScore(englishCountryName, data) {
+  // --- Green Score ---
+  const normalizedValues = {
+    co2: Math.min(data.co2 / 15, 1),                  // high = bad
+    air: 1 - Math.min(data.air / 30, 1),              // high = good
+    water: Math.min(data.water / 1000, 1),            // high = bad
+    waste: Math.min(data.waste / 25, 1),              // high = bad
+    biodiversity: 1 - Math.min(data.biodiversity / 100, 1), // high = good
+    renewables: 1 - Math.min(data.renewables / 100, 1),     // high = good
+    transparency: 1 - Math.min((data.transparency || 50) / 100, 1)  // high = good
+  };
+
+  const greenScore = 1 - (
+    normalizedValues.co2 +
+    normalizedValues.water +
+    normalizedValues.waste +
+    normalizedValues.biodiversity +
+    normalizedValues.renewables +
+    normalizedValues.transparency +
+    normalizedValues.air
+  ) / 7;
+
+  const greenScorePercent = (greenScore * 100).toFixed(1);
+
+  if (document.getElementById("country-name")) {
+    document.getElementById("country-name").innerText = englishCountryName;
+  }
+
+  const badge = document.getElementById("green-score");
+  if (badge) {
+    badge.innerText = `${greenScorePercent}%`;
+    badge.classList.remove("green", "medium", "low");
+    if (greenScore >= 0.75) {
+      badge.classList.add("green");
+    } else if (greenScore >= 0.5) {
+      badge.classList.add("medium");
+    } else {
+      badge.classList.add("low");
+    }
+  }
+
+  console.log(`🌿 ${englishCountryName} → Green Score: ${greenScorePercent}%`);
+}
+
+// Display "No Data" for countries without environmental data
+function displayNoDataGreenScore(englishCountryName) {
+  if (document.getElementById("country-name")) {
+    document.getElementById("country-name").innerText = englishCountryName;
+  }
+
+  const badge = document.getElementById("green-score");
+  if (badge) {
+    badge.innerText = "No Data";
+    badge.classList.remove("green", "medium", "low");
+    badge.classList.add("no-data");
+  }
+
+  console.log(`⚪ ${englishCountryName} → No environmental data available`);
 }
 
 function draw() {
